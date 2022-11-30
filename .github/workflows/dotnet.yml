@@ -16,7 +16,7 @@ jobs:
       matrix:
         include:
           - os: macos-latest
-            RID: macos-arm64
+            RID: osx-x64
 
           - os: ubuntu-latest
             RID: linux-x64
