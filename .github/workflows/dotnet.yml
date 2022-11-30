@@ -16,7 +16,7 @@ jobs:
       matrix:
         include:
           - os: macos-latest
-            RID: osx-x64
+            RID: macos-arm64
 
           - os: ubuntu-latest
             RID: linux-x64
@@ -37,3 +37,11 @@ jobs:
     #  run: dotnet test --no-build --verbosity normal
     - name: publish
       run: dotnet publish -c Release -r ${{matrix.RID}}
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v3.1.1
+      with:
+        # Artifact name
+        name: executable for ${{matrix.RID}}
+        # A file, directory or wildcard pattern that describes what to upload
+        path: /publish/net7.0/${{matrix.RID}}/publish/gigman*
+        retention-days: 0 # optional
