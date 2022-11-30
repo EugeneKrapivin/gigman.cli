@@ -43,5 +43,5 @@ jobs:
         # Artifact name
         name: executable for ${{matrix.RID}}
         # A file, directory or wildcard pattern that describes what to upload
-        path: /publish/net7.0/${{matrix.RID}}/publish/gigman*
+        path: ./publish/net7.0/${{matrix.RID}}/publish/gigman*
         retention-days: 0 # optional
