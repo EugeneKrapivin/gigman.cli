@@ -21,10 +21,7 @@ var root = RootCommandFactory.CreateRootCommand(sp, PrintHeaderAsync);
 
 if (args.Length == 0)
 {
-    args = new[] { "site", "scrape", "--apikey", "3_I0hI7_M6zfXEmJxRE4YW-i_Z6Np2x42Wchmp0UlQgbOShymhG_pOsuT7Pu3B7SGf" };
-    //args = new[] { "site", "apply", "--name", "evgenekr-pc_parentsite_au1.com" };
-    //args = new[] { "context", "set", "-n", "eugene" };
-    //args = new[] { "-h" };
+    args = new[] { "-h" };
 }
 
 await root.InvokeAsync(args);
