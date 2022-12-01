@@ -19,7 +19,7 @@ var root = RootCommandFactory.CreateRootCommand(sp, PrintHeaderAsync);
 
 if (args.Length == 0)
 {
-    args = new[] { "site","apply","--self","-e","dev","-s","eugene_test_sites" };
+    args = new[] { "-h" };
 }
 
 await root.InvokeAsync(args);
