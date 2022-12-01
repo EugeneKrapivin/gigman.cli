@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text.Json.JsonDiffPatch;
 using System.Text.Json.JsonDiffPatch.Diffs.Formatters;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 
 namespace GigyaManagement.CLI.Services.GigyaApi.Configurators;
 
@@ -29,7 +30,12 @@ public class GigyaSchemaConfigurator : IGigyaResourceConfigurator<AccountsSchema
 
         await _gigyaService.ExecuteGigyaApi<GigyaResponse>("accounts.setSchema", 
             new Dictionary<string, string> { ["apikey"] = apikey }, 
-            resource.ToGigyaFormUrl(p => p == "dynamicSchema"));
+            new RequestModel { DataSchema = resource.DataSchema}.ToGigyaFormUrl(p => p != "dynamicSchema"));
+    }
+    private class RequestModel
+    {
+        [JsonPropertyName("dataSchema")]
+        public Schema DataSchema { get; set; }
     }
 
     public Task<AccountsSchema> Extract(string apikey)

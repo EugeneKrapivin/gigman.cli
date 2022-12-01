@@ -5,11 +5,9 @@ using GigyaManagement.CLI.Services.GigyaApi.Configurators;
 using GigyaManagement.CLI.Services.GigyaApi.Models;
 using GigyaManagement.CLI.Services.Template;
 
-using MediatR;
+using Mediator;
 
 using Microsoft.Extensions.DependencyInjection;
-
-using Serilog;
 
 using System.CommandLine;
 using System.CommandLine.Parsing;
@@ -26,13 +24,13 @@ if (args.Length == 0)
 
 await root.InvokeAsync(args);
 
-Log.CloseAndFlush();
+//Log.CloseAndFlush();
 
 static ServiceProvider Bootstrap()
 {
     var services = new ServiceCollection();
     
-    services.AddMediatR(Assembly.GetExecutingAssembly());
+    services.AddMediator();
 
     services.AddSingleton<IGigyaService, GigyaService>();
     services.AddSingleton<IGigyaResourceConfigurator<SiteConfig, string>, GigyaSiteConfigConfigurator>();
@@ -76,7 +74,7 @@ static async Task PrintHeaderAsync(IConsole console)
     }
     catch
     {
-        Log.Logger.Debug("failed to fetch latest version from gist");
+        console.WriteLine("failed to fetch latest version from gist");
     }
     console.WriteLine("");
 }

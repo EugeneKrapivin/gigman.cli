@@ -1,6 +1,4 @@
-﻿using Serilog;
-
-using System.Text.Json;
+﻿using System.Text.Json;
 
 namespace GigyaManagement.CLI.Services.Context;
 
@@ -26,23 +24,10 @@ public class ContextService : IContextService
         _context = Load();
     }
 
-    private void Persist(FileStream? stream = null)
+    private void Persist()
     {
-        if (stream is null)
-        {
-            using var file = File.OpenWrite(_contextFile);
-            JsonSerializer.Serialize(new Utf8JsonWriter(file), _context, typeof(ContextModel), new JsonSerializerOptions()
-            {
-                WriteIndented = true
-            });
-        }
-        else
-        {
-            JsonSerializer.Serialize(new Utf8JsonWriter(stream), _context, typeof(ContextModel), new JsonSerializerOptions()
-            {
-                WriteIndented = true
-            });
-        }
+        var content = JsonSerializer.Serialize(_context, GlobalUsings.JsonSerializerOptions);
+        File.WriteAllText(_contextFile, content);
     }
 
     private ContextModel Load()
@@ -88,8 +73,7 @@ public class ContextService : IContextService
         
         if (context == null)
         {
-            Log.Logger.Error("The defined context is not found, please use list and then set to select a new context");
-            return null;
+            throw new Exception("The defined context is not found, please use list and then set to select a new context");
         }
         
         return context;

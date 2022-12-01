@@ -1,6 +1,6 @@
 ﻿using GigyaManagement.CLI.Handlers;
 
-using MediatR;
+using Mediator;
 
 using System.CommandLine;
 

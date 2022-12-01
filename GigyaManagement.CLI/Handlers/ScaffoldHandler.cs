@@ -4,14 +4,7 @@ using GigyaManagement.CLI.Services.Template;
 using GigyaManagement.CLI.Services.Template.ProjectModels;
 using GigyaManagement.CLI.Services.Template.ProjectModels.Resources;
 
-using MediatR;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
+using Mediator;
 
 namespace GigyaManagement.CLI.Handlers;
 
@@ -45,7 +38,7 @@ public class ScaffoldHandler : IRequestHandler<ScrapeSiteRequest, ScrapeSiteResu
         _projectManager = projectManager;
     }
     
-    public async Task<ScrapeSiteResult> Handle(ScrapeSiteRequest request, CancellationToken cancellationToken)
+    public async ValueTask<ScrapeSiteResult> Handle(ScrapeSiteRequest request, CancellationToken cancellationToken)
     {
         var gigProject = new SiteProject
         {
@@ -53,7 +46,14 @@ public class ScaffoldHandler : IRequestHandler<ScrapeSiteRequest, ScrapeSiteResu
             IsTemplate = request.IsTemplate,
             SiteConfigResource = new SiteConfigResource { Resource = await _siteConfigConfigurator.Extract(request.ApiKey) },
             AccountsSchemaResource = new AccountsSchemaResource { Resource = await _accountsSchemaConfigurator.Extract(request.ApiKey) },
-            ScreenSetsResource = new ScreenSetsResource { Resource = await _screenSetsConfigurator.Extract(request.ApiKey)}
+            ScreenSetsResource = new ScreenSetsResource { Resource = await _screenSetsConfigurator.Extract(request.ApiKey)},
+            DataFlowsResource = new(),
+            EmailTemplatesResource = new(),
+            ExtensionsResource = new(),
+            FlowsResource = new(),
+            HostedPagesResource = new(),
+            IdentitySecurityResource = new(),
+            SmsTemplatesResource = new()
         };
         
         var path = await _projectManager.SaveProject(gigProject);

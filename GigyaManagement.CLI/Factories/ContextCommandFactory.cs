@@ -1,4 +1,5 @@
-﻿using GigyaManagement.CLI.Services.Context;
+﻿using GigyaManagement.CLI;
+using GigyaManagement.CLI.Services.Context;
 
 using Microsoft.Extensions.Options;
 
@@ -19,7 +20,6 @@ public class ContextCommandFactory : ICommandFactory
     public Command CreateCommand()
     {
         var command = new Command("context", "manage the tool execution context");
-        command.AddAlias("ctx");
 
         command.AddCommand(AddListSubCommand());
         command.AddCommand(AddCurrentSubCommand());
@@ -35,7 +35,7 @@ public class ContextCommandFactory : ICommandFactory
         command.SetHandler(() =>
         {
             var contexts = _contextService.GetAllContexts();
-            Console.WriteLine(JsonSerializer.Serialize(contexts, new JsonSerializerOptions { WriteIndented = true }));
+            Console.WriteLine(JsonSerializer.Serialize(contexts, GlobalUsings.JsonSerializerOptions));
         });
         return command;
     }
@@ -55,7 +55,7 @@ public class ContextCommandFactory : ICommandFactory
             }
             else
             {
-                context.Console.WriteLine(JsonSerializer.Serialize(current, new JsonSerializerOptions { WriteIndented = true }));
+                context.Console.WriteLine(JsonSerializer.Serialize(current, GlobalUsings.JsonSerializerOptions));
             }
         });
 
@@ -67,7 +67,7 @@ public class ContextCommandFactory : ICommandFactory
         var nameOption = new Option<string>(new[] { "--name", "-n" }) { IsRequired = true };
         var userKeyOption = new Option<string>(new[] { "--userkey", "-k" }) { IsRequired = true };
         var secretOption = new Option<string>(new[] { "--secret", "-s" }) { IsRequired = true };
-        var workspaceOption = new Option<string>(new[] { "--workspace", "-w" }) { IsRequired = true };
+        var workspaceOption = new Option<string>(new[] { "--workspace", "-w" }) { IsRequired = false };
 
         var command = new Command("create", "creates a new context. newly created contexts are not automatically set as added")
         {
@@ -82,15 +82,21 @@ public class ContextCommandFactory : ICommandFactory
             var workspace = ctx.BindingContext.ParseResult.GetValueForOption(workspaceOption);
             try
             {
-                var added = _contextService.CreateNewContext(new WorkspaceContext
+                var context = new WorkspaceContext
                 {
                     Name = name,
                     UserKey = userkey,
                     Secret = secret,
-                    Workspace = workspace
-                });
+                };
+
+                if (!string.IsNullOrEmpty(workspace))
+                {
+                    context.Workspace = workspace;
+                }
+                
+                var added = _contextService.CreateNewContext(context);
                 ctx.Console.WriteLine($"Added \"{name}\" context:");
-                ctx.Console.WriteLine(JsonSerializer.Serialize(added, new JsonSerializerOptions { WriteIndented = true }));
+                ctx.Console.WriteLine(JsonSerializer.Serialize(added, GlobalUsings.JsonSerializerOptions));
             }
             catch (Exception ex) 
             { 
@@ -121,7 +127,7 @@ public class ContextCommandFactory : ICommandFactory
             {
                 var set = _contextService.SetContext(name);
                 ctx.Console.WriteLine($"Setting \"{name}\" context as current");
-                ctx.Console.WriteLine(JsonSerializer.Serialize(set, new JsonSerializerOptions { WriteIndented = true }));
+                ctx.Console.WriteLine(JsonSerializer.Serialize(set, GlobalUsings.JsonSerializerOptions));
             }
             catch (Exception ex)
             {

@@ -9,13 +9,6 @@ public interface IPersistable
     [JsonIgnore]
     public static abstract string ConfigFileName { get; }
 
-    protected static JsonSerializerOptions _jsonSerializerOptions = new()
-    {
-        WriteIndented = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-    };
-
     public Task<string> Serialize();
 
     public Task<string> PersistToDisk(string projectPath);
@@ -48,18 +41,10 @@ public static class ProjectResource
             file = Path.Combine(path, conf);
         }
 
-        var project = JsonSerializer.Deserialize<T>(File.ReadAllText(file), _jsonSerializerOptions);
+        var project = JsonSerializer.Deserialize<T>(File.ReadAllText(file), GlobalUsings.JsonSerializerOptions);
 
         return Task.FromResult(project);
     }
-
-    private static JsonSerializerOptions _jsonSerializerOptions = new()
-    {
-        WriteIndented = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-    };
-
 }
 
 public abstract class ProjectResource<T>
@@ -68,14 +53,7 @@ public abstract class ProjectResource<T>
 
     public string? InheritFrom { get; set; }
 
-    protected static JsonSerializerOptions _jsonSerializerOptions = new()
-    {
-        WriteIndented = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-    };
-
-    public virtual Task<string> Serialize() => Task.FromResult(JsonSerializer.Serialize(this, _jsonSerializerOptions));
+    public virtual Task<string> Serialize() => Task.FromResult(JsonSerializer.Serialize(this, GlobalUsings.JsonSerializerOptions));
 
     public virtual async Task<string> PersistToDisk(string projectPath, string configFileName)
     {

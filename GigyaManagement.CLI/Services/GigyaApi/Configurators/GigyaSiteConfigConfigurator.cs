@@ -43,9 +43,9 @@ public class GigyaSiteConfigConfigurator : IGigyaResourceConfigurator<SiteConfig
 
 public static class FormUrlExtensions
 {
-    public static Dictionary<string,string> ToGigyaFormUrl<T>(this T source, params Func<string, bool>[] filter)
+    public static Dictionary<string,string> ToGigyaFormUrl<T>(this T source, params Func<string, bool>[] filters)
         => JsonNode.Parse(JsonSerializer.Serialize(source)).AsObject()
-            .Where(x => !filter.Any(f => f(x.Key)))
+            .Where(x => filters.All(filter => !filter(x.Key)))
             .Aggregate(new Dictionary<string,string>(), (acc, elem) =>
             {
                 acc.Add(elem.Key, Serialize(elem.Value));

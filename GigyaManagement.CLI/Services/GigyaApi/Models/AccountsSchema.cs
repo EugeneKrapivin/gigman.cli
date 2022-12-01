@@ -5,17 +5,17 @@ namespace GigyaManagement.CLI.Services.GigyaApi.Models;
 
 public sealed class AccountsSchema
 {
-    //[JsonPropertyName("profileSchema")]
-    //public Schema ProfileSchema { get; set; }
+    [JsonPropertyName("profileSchema")]
+    public Schema ProfileSchema { get; set; }
 
     [JsonPropertyName("dataSchema")]
     public Schema DataSchema { get; set; }
 
-    //[JsonPropertyName("subscriptionsSchema")]
-    //public SubscriptionsSchema SubscriptionsSchema { get; set; }
+    [JsonPropertyName("subscriptionsSchema")]
+    public SubscriptionsSchema SubscriptionsSchema { get; set; }
 
-    //[JsonPropertyName("preferencesSchema")]
-    //public PreferencesSchema PreferencesSchema { get; set; }
+    [JsonPropertyName("preferencesSchema")]
+    public PreferencesSchema PreferencesSchema { get; set; }
 }
 
 public partial class Field

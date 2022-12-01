@@ -20,6 +20,27 @@ public sealed class SiteProject : IPersistable
     [JsonIgnore]
     public ScreenSetsResource? ScreenSetsResource { get; set; }
 
+    [JsonIgnore]
+    public DataFlowsResource? DataFlowsResource { get; set; }
+    
+    [JsonIgnore]
+    public SmsTemplatesResource SmsTemplatesResource { get; set; }
+    
+    [JsonIgnore]
+    public EmailTemplatesResource? EmailTemplatesResource { get; set; }
+    
+    [JsonIgnore]
+    public ExtensionsResource? ExtensionsResource { get; set; }
+    
+    [JsonIgnore]
+    public FlowsResource? FlowsResource { get; set; }
+    
+    [JsonIgnore]
+    public HostedPagesResource? HostedPagesResource { get; set; }
+    
+    [JsonIgnore]
+    public IdentitySecurityResource? IdentitySecurityResource { get; set; }
+
     public string? InheritFrom { get; set; }
 
     [JsonIgnore]
@@ -43,11 +64,18 @@ public sealed class SiteProject : IPersistable
             file = Path.Combine(path, ConfigFileName);
         }
         var fileContent = await File.ReadAllTextAsync(file);
-        var project = JsonSerializer.Deserialize<SiteProject>(fileContent, _serializerOptions);
+        var project = JsonSerializer.Deserialize<SiteProject>(fileContent, GlobalUsings.JsonSerializerOptions);
 
         project.SiteConfigResource = await SiteConfigResource.Load(path);
         project.AccountsSchemaResource = await AccountsSchemaResource.Load(path);
         project.ScreenSetsResource = await ScreenSetsResource.Load(path);
+        project.IdentitySecurityResource = await IdentitySecurityResource.Load(path);
+        project.HostedPagesResource = await HostedPagesResource.Load(path);
+        project.FlowsResource = await FlowsResource.Load(path);
+        project.ExtensionsResource = await ExtensionsResource.Load(path);
+        project.EmailTemplatesResource = await EmailTemplatesResource.Load(path);
+        project.DataFlowsResource = await DataFlowsResource.Load(path);
+        project.SmsTemplatesResource = await SmsTemplatesResource.Load(path);
 
         return project;
     }
@@ -62,16 +90,16 @@ public sealed class SiteProject : IPersistable
         await SiteConfigResource?.PersistToDisk(projectPath);
         await AccountsSchemaResource?.PersistToDisk(projectPath);
         await ScreenSetsResource?.PersistToDisk(projectPath);
+        await IdentitySecurityResource?.PersistToDisk(projectPath);
+        await HostedPagesResource?.PersistToDisk(projectPath);
+        await FlowsResource?.PersistToDisk(projectPath);
+        await ExtensionsResource?.PersistToDisk(projectPath);
+        await EmailTemplatesResource?.PersistToDisk(projectPath);
+        await DataFlowsResource?.PersistToDisk(projectPath);
+        await SmsTemplatesResource?.PersistToDisk(projectPath);
 
         return path;
     }
 
-    private static JsonSerializerOptions _serializerOptions = new ()
-    {
-        WriteIndented = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-    };
-
-    public Task<string> Serialize() => Task.FromResult(JsonSerializer.Serialize(this, _serializerOptions));
+    public Task<string> Serialize() => Task.FromResult(JsonSerializer.Serialize(this, GlobalUsings.JsonSerializerOptions));
 }

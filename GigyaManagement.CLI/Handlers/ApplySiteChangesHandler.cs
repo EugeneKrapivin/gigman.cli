@@ -3,8 +3,7 @@ using GigyaManagement.CLI.Services.GigyaApi;
 using GigyaManagement.CLI.Services.GigyaApi.Models;
 using GigyaManagement.CLI.Services.Template;
 
-using MediatR;
-
+using Mediator;
 namespace GigyaManagement.CLI.Handlers;
 
 
@@ -41,7 +40,7 @@ public class ApplySiteChangesHandler : IRequestHandler<ApplySiteChangesRequest, 
         _projectManager = projectManager;
     }
 
-    public async Task<ApplySiteChangesResult> Handle(ApplySiteChangesRequest request, CancellationToken cancellationToken)
+    public async ValueTask<ApplySiteChangesResult> Handle(ApplySiteChangesRequest request, CancellationToken cancellationToken)
     {
         var siteFolder = Path.Combine(_context.Workspace, ProjectFolderScope(request.IsTemplate), request.Site);
 

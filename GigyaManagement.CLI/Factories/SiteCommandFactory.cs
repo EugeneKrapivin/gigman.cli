@@ -1,7 +1,7 @@
 ﻿using GigyaManagement.CLI.Handlers;
 using GigyaManagement.CLI.Services.Context;
 
-using MediatR;
+using Mediator;
 
 using System.CommandLine;
 using System.CommandLine.IO;

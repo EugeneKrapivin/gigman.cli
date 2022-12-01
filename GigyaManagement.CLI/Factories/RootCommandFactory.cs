@@ -1,8 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-using Serilog;
-using Serilog.Sinks.SystemConsole.Themes;
-
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Parsing;
@@ -33,23 +30,23 @@ public static class RootCommandFactory
         root.AddGlobalOption(logOpt);
         builder.AddMiddleware(ctx =>
         {
-            var lvl = ctx.ParseResult.GetValueForOption(logOpt);
-            var loggerConf = new LoggerConfiguration();
+            //var lvl = ctx.ParseResult.GetValueForOption(logOpt);
+            //var loggerConf = new LoggerConfiguration();
 
-            loggerConf = lvl switch
-            {
-                "verbose" => loggerConf.MinimumLevel.Verbose(),
-                "debug" => loggerConf.MinimumLevel.Debug(),
-                "info" => loggerConf.MinimumLevel.Information(),
-                "warn" => loggerConf.MinimumLevel.Warning(),
-                "err" => loggerConf.MinimumLevel.Error(),
-                "fatal" => loggerConf.MinimumLevel.Fatal(),
-                _ => throw new NotImplementedException()
-            };
+            //loggerConf = lvl switch
+            //{
+            //    "verbose" => loggerConf.MinimumLevel.Verbose(),
+            //    "debug" => loggerConf.MinimumLevel.Debug(),
+            //    "info" => loggerConf.MinimumLevel.Information(),
+            //    "warn" => loggerConf.MinimumLevel.Warning(),
+            //    "err" => loggerConf.MinimumLevel.Error(),
+            //    "fatal" => loggerConf.MinimumLevel.Fatal(),
+            //    _ => throw new NotImplementedException()
+            //};
 
-            Log.Logger = loggerConf
-                .WriteTo.Console(theme: AnsiConsoleTheme.Code)
-                .CreateLogger();
+            //Log.Logger = loggerConf
+            //    .WriteTo.Console(theme: AnsiConsoleTheme.Code)
+            //    .CreateLogger();
 
         });
 

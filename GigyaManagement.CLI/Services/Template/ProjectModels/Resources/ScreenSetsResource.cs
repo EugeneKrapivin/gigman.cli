@@ -13,7 +13,7 @@ public class ScreenSetsResource : ProjectResource<ScreenSetsConfig>, IPersistabl
     public static async Task<ScreenSetsResource> Load(string path)
     {
         var resourceConfigContent = await File.ReadAllTextAsync(Path.Combine(path, ConfigFileName));
-        var resource = JsonSerializer.Deserialize<ScreenSetsConfigOnDiskModel>(resourceConfigContent, _jsonSerializerOptions);
+        var resource = JsonSerializer.Deserialize<ScreenSetsConfigOnDiskModel>(resourceConfigContent, GlobalUsings.JsonSerializerOptions);
 
         List<ScreenSet> screenSets = new();
         foreach (var screenSetId in resource.ScreenSets)
@@ -21,7 +21,7 @@ public class ScreenSetsResource : ProjectResource<ScreenSetsConfig>, IPersistabl
             var folder = Path.Combine(path, "screens_sets", screenSetId);
 
             var conf = await File.ReadAllTextAsync(Path.Combine(folder, $"{screenSetId}.config.json"));
-            var screenSet = JsonSerializer.Deserialize<ScreenSet>(conf, _jsonSerializerOptions);
+            var screenSet = JsonSerializer.Deserialize<ScreenSet>(conf, GlobalUsings.JsonSerializerOptions);
             screenSet.Html = await File.ReadAllTextAsync(Path.Combine(folder, $"{screenSetId}.html"));
             screenSet.Css = await File.ReadAllTextAsync(Path.Combine(folder, $"{screenSetId}.css"));
             screenSet.Javascript = await File.ReadAllTextAsync(Path.Combine(folder, $"{screenSetId}.js"));
@@ -63,12 +63,7 @@ public class ScreenSetsResource : ProjectResource<ScreenSetsConfig>, IPersistabl
                 Translations = screenSet.Translations,
                 RawTranslations = screenSet.RawTranslations,
                 CompressionType = screenSet.CompressionType
-            }, new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-            });
+            }, GlobalUsings.JsonSerializerOptions);
     }
 
     public override Task<string> Serialize()
@@ -76,11 +71,7 @@ public class ScreenSetsResource : ProjectResource<ScreenSetsConfig>, IPersistabl
         {
             InheritFrom = InheritFrom,
             ScreenSets = Resource.ScreenSets.Select(x => x.ScreenSetId).ToList()
-        }, new JsonSerializerOptions {
-            WriteIndented = true,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-        }));
+        }, GlobalUsings.JsonSerializerOptions));
 
     internal class ScreenSetsConfigOnDiskModel
     {
