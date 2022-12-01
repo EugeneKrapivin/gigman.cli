@@ -3,6 +3,7 @@
 using System;
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace GigyaManagement.CLI.Services.Template.ProjectModels.Resources;
@@ -11,9 +12,12 @@ public class AccountsSchemaResource : ProjectResource<AccountsSchema>, IPersista
 {
     const string _folderName = "accounts_schemas";
     const string _dataSchemaFile = "schema.data.json";
+    const string _dataJsonSchema = "https://gist.githubusercontent.com/EugeneKrapivin/a8adfe1bbac7b0bf80497a456ea91822/raw/dd1fc214c4482c3fe99afcb5e376cf8e83a60123/schema.data.json";
     const string _profileSchemaFile = "schema.profile.json";
     const string _subscriptionSchemaFile = "schema.subscriptions.json";
+    const string _subsctiptionsJsonSchema = "https://gist.githubusercontent.com/EugeneKrapivin/9196cb41eaf4568af5aa9ffbecd133bf/raw/86af60665816e62cbd3dfec1ef68cd489a4ecd1d/schema.subscriptions.json";
     const string _preferencesSchemaFile = "schema.preferences.json";
+    const string _preferencesJsonSchema = "https://gist.githubusercontent.com/EugeneKrapivin/c71d445896a422e70b42035d087d9419/raw/327741c4cf46e3159eeacd2ecb7c178b98baebf3/schema.preferences,json";
 
     [JsonIgnore]
     public static string ConfigFileName => $"site.{_folderName}.json";
@@ -57,10 +61,10 @@ public class AccountsSchemaResource : ProjectResource<AccountsSchema>, IPersista
         Directory.CreateDirectory(folderPath);
         
         // TODO: generate json schema and add it to the JSON file for VSc auto completion
-        await File.WriteAllTextAsync(GetSchemaPath(folderPath, _dataSchemaFile), JsonSerializer.Serialize(Resource.DataSchema, GlobalUsings.JsonSerializerOptions));
-        await File.WriteAllTextAsync(GetSchemaPath(folderPath, _profileSchemaFile), JsonSerializer.Serialize(Resource.ProfileSchema, GlobalUsings.JsonSerializerOptions));
-        await File.WriteAllTextAsync(GetSchemaPath(folderPath, _subscriptionSchemaFile), JsonSerializer.Serialize(Resource.SubscriptionsSchema, GlobalUsings.JsonSerializerOptions));
-        await File.WriteAllTextAsync(GetSchemaPath(folderPath, _preferencesSchemaFile), JsonSerializer.Serialize(Resource.PreferencesSchema, GlobalUsings.JsonSerializerOptions));
+        await File.WriteAllTextAsync(GetSchemaPath(folderPath, _dataSchemaFile), SerializeWithSchema(Resource.DataSchema, _dataJsonSchema));
+        await File.WriteAllTextAsync(GetSchemaPath(folderPath, _profileSchemaFile), SerializeWithSchema(Resource.ProfileSchema, _dataJsonSchema));
+        await File.WriteAllTextAsync(GetSchemaPath(folderPath, _subscriptionSchemaFile), SerializeWithSchema(Resource.SubscriptionsSchema, _subsctiptionsJsonSchema));
+        await File.WriteAllTextAsync(GetSchemaPath(folderPath, _preferencesSchemaFile), SerializeWithSchema(Resource.PreferencesSchema, _preferencesJsonSchema));
 
         var conf = new OnDiskModel
         {
@@ -81,6 +85,14 @@ public class AccountsSchemaResource : ProjectResource<AccountsSchema>, IPersista
         await File.WriteAllTextAsync(path, content);
 
         return folderPath;
+
+        static string SerializeWithSchema<T>(T source, string schemaUrl)
+        {
+            var obj = JsonObject.Parse(JsonSerializer.Serialize(source));
+            obj["$schema"] = schemaUrl;
+
+            return obj.ToJsonString(GlobalUsings.JsonSerializerOptions) ?? string.Empty;
+        }
     }
 
     static string GetSchemaPath(string root, string file) => Path.Combine(root, file);
