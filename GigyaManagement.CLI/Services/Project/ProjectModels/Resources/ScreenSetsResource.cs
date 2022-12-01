@@ -9,16 +9,18 @@ public class ScreenSetsResource : ProjectResource<ScreenSetsConfig>, IPersistabl
 {
     [JsonIgnore]
     public static string ConfigFileName => "screensets.json";
-
+    const string _folder = "screens_sets";
     public static async Task<ScreenSetsResource> Load(string path)
     {
+        path = Path.Combine(path, _folder);
+
         var resourceConfigContent = await File.ReadAllTextAsync(Path.Combine(path, ConfigFileName));
-        var resource = JsonSerializer.Deserialize<ScreenSetsConfigOnDiskModel>(resourceConfigContent, GlobalUsings.JsonSerializerOptions);
+        var resource = JsonSerializer.Deserialize<ScreenSetsConfigOnDiskModel>(resourceConfigContent, GlobalUsings.JsonSerializerOptions)!;
 
         List<ScreenSet> screenSets = new();
         foreach (var screenSetId in resource.ScreenSets)
         {
-            var folder = Path.Combine(path, "screens_sets", screenSetId);
+            var folder = Path.Combine(path, screenSetId);
 
             var conf = await File.ReadAllTextAsync(Path.Combine(folder, $"{screenSetId}.config.json"));
             var screenSet = JsonSerializer.Deserialize<ScreenSet>(conf, GlobalUsings.JsonSerializerOptions);
@@ -54,7 +56,8 @@ public class ScreenSetsResource : ProjectResource<ScreenSetsConfig>, IPersistabl
             await File.WriteAllTextAsync(Path.Combine(folder, $"{screenSetId}.js"), screen.Javascript);
         }
 
-        return await base.PersistToDisk(projectPath, ConfigFileName);
+        var path = Path.Combine(projectPath, _folder);
+        return await base.PersistToDisk(path, ConfigFileName);
 
         static string SerializeSceenSet(ScreenSet screenSet)
             => JsonSerializer.Serialize(new ScreenSetOnDiskModel

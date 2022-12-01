@@ -13,7 +13,7 @@ public class ScreenSetsConfig
 
 public class ScreenSet
 {
-    [JsonPropertyName("screenSetID")]
+    [JsonPropertyName("screenSetId")]
     public string ScreenSetId { get; set; }
 
     [JsonPropertyName("html")]

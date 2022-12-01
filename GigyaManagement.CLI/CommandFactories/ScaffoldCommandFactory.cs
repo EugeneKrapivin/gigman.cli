@@ -18,7 +18,6 @@ public class ScaffoldCommandFactory : ICommandFactory
     public Command CreateCommand()
     {
         var command = new Command("scaffold", "attempts to scrape an existing site");
-        command.AddAlias("scfld");
 
         command.Add(CreateScaffoldTemplateCommand());
         

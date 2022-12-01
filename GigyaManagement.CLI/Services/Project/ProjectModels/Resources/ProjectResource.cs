@@ -21,7 +21,7 @@ public interface ILoadable<T> where T: ILoadable<T>, IPersistable
 
 public static class ProjectResource
 {
-    public static Task<T> Load<T>(string path)
+    public static Task<T?> Load<T>(string path)
           where T : IPersistable
     {
         var file = path;

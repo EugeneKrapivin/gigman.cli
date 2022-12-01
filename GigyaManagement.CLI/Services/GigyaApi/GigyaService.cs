@@ -52,7 +52,7 @@ public class GigyaService : IGigyaService, IDisposable
             {
                 var bytes = await gigyaResponse.Content.ReadAsByteArrayAsync();
                 var r = Encoding.UTF8.GetString(bytes);
-                var gig = JsonSerializer.Deserialize<GigyaResponse>(r);
+                var gig = JsonSerializer.Deserialize<GigyaResponse>(r)!;
                 gigyaResponse = await Execute($"{gig.Location}?{baseQuery}", body);
             }
             else 
@@ -63,6 +63,11 @@ public class GigyaService : IGigyaService, IDisposable
         }
 
         var siteConfig = await gigyaResponse.Content.ReadFromJsonAsync<TResult>();
+
+        if (siteConfig is null)
+        {
+            throw new Exception("got a null result from gigya");
+        }
 
         return siteConfig;
 
@@ -78,7 +83,7 @@ public class GigyaService : IGigyaService, IDisposable
             if (command.StartsWith("admin")) return "admin.us1.gigya.com";
             if (command.StartsWith("accounts")) return "accounts.us1.gigya.com";
 
-            return null;
+            throw new NotSupportedException($"cant calculate the required gigya namespace for \"{command}\"");
         }
     }
 

@@ -1,13 +1,11 @@
 ﻿using GigyaManagement.CLI.Services.Context;
-using GigyaManagement.CLI.Services.Template.ProjectModels.Resources;
+using GigyaManagement.CLI.Services.Project.ProjectModels;
 
 namespace GigyaManagement.CLI.Services.Template;
 
 public interface IProjectManager
 {
-    public Task<string> SaveProject(SiteProject siteProject);
-
-    public Task<SiteProject> LoadProject(string projectPath);
+    public Task<GigyaSolution> LoadSolution(string solutionPath);
 }
 
 public class ProjectManagerOptions
@@ -29,24 +27,8 @@ public class ProjectManager : IProjectManager
         _partnerContext = partnerContext;
     }
 
-    public Task<SiteProject> LoadProject(string projectPath)
+    public Task<GigyaSolution> LoadSolution(string solutionPath)
     {
-        return SiteProject.Load(projectPath);
-    }
-
-    public async Task<string> SaveProject(SiteProject siteProject)
-    {
-        var path = _partnerContext.Workspace;
-        var folder = siteProject.IsTemplate 
-            ? _defaultTemplatesFolder 
-            : _defaultSitesFolder;
-        
-        var projectFolder = Path.Combine(path, folder, siteProject.SiteConfigResource.Resource.BaseDomain);
-        Directory.CreateDirectory(projectFolder);
-        await Console.Out.WriteLineAsync($"writing project resource to \"{projectFolder}\"");
-
-        await siteProject.PersistToDisk(projectFolder);
-        
-        return projectFolder;
+        return GigyaSolution.Load(solutionPath);
     }
 }

@@ -76,9 +76,9 @@ public class ContextCommandFactory : ICommandFactory
 
         command.SetHandler(ctx =>
         {
-            var name = ctx.BindingContext.ParseResult.GetValueForOption(nameOption);
-            var userkey = ctx.BindingContext.ParseResult.GetValueForOption(userKeyOption);
-            var secret = ctx.BindingContext.ParseResult.GetValueForOption(secretOption);
+            var name = ctx.BindingContext.ParseResult.GetValueForOption(nameOption)!;
+            var userkey = ctx.BindingContext.ParseResult.GetValueForOption(userKeyOption)!;
+            var secret = ctx.BindingContext.ParseResult.GetValueForOption(secretOption)!;
             var workspace = ctx.BindingContext.ParseResult.GetValueForOption(workspaceOption);
             try
             {
@@ -122,7 +122,7 @@ public class ContextCommandFactory : ICommandFactory
 
         command.SetHandler((ctx) =>
         {
-            var name = ctx.BindingContext.ParseResult.GetValueForOption(nameOption);
+            var name = ctx.BindingContext.ParseResult.GetValueForOption(nameOption)!;
             try
             {
                 var set = _contextService.SetContext(name);

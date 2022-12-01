@@ -9,8 +9,14 @@ namespace GigyaManagement.CLI.Handlers;
 
 public class ApplySiteChangesRequest : IRequest<ApplySiteChangesResult>
 {
-    public required string Site { get; init; }
-    public bool IsTemplate { get; set; } = false;
+    public required string Solution { get; set; }
+
+    public required string Environment { get; init; }
+
+    public string? TargetApiKey { get; set; } = null;
+    public bool SelfApply { get; set; } = true;
+
+    public bool IsTemplate { get; internal set; }
 }
 
 public class ApplySiteChangesResult
@@ -42,17 +48,28 @@ public class ApplySiteChangesHandler : IRequestHandler<ApplySiteChangesRequest, 
 
     public async ValueTask<ApplySiteChangesResult> Handle(ApplySiteChangesRequest request, CancellationToken cancellationToken)
     {
-        var siteFolder = Path.Combine(_context.Workspace, ProjectFolderScope(request.IsTemplate), request.Site);
+        var siteFolder = Path.Combine(_context.Workspace);
 
-        var project = await _projectManager.LoadProject(siteFolder);
+        var solution = await _projectManager.LoadSolution(siteFolder);
 
-        if (project.SiteConfigResource?.Resource is not null) await _siteConfigConfigurator.Apply(project.ApiKey, project.SiteConfigResource.Resource);
-        if (project.AccountsSchemaResource?.Resource is not null) await _accountsSchemaConfigurator.Apply(project.ApiKey, project.AccountsSchemaResource.Resource);
-        if (project.ScreenSetsResource?.Resource is not null) await _screenSetsConfigurator.Apply(project.ApiKey, project.ScreenSetsResource.Resource);
+        var project = solution.Environments.SingleOrDefault(x => x.Environment == request.Environment);
+        
+        if (project == null)
+        {
+            throw new Exception($"Environment \"{request.Environment}\" was not found for solution \"{request.Solution}\"");
+        }
+
+        var target = request.SelfApply ? project.Apikey : request.TargetApiKey;
+
+        if (!request.SelfApply && string.IsNullOrEmpty(request.TargetApiKey))
+        {
+            throw new Exception("when not applying to self, a target apikey must be passed");
+        }
+
+        if (project.SiteConfigResource?.Resource is not null) await _siteConfigConfigurator.Apply(target!, project.SiteConfigResource.Resource);
+        if (project.AccountsSchemaResource?.Resource is not null) await _accountsSchemaConfigurator.Apply(target!, project.AccountsSchemaResource.Resource);
+        if (project.ScreenSetsResource?.Resource is not null) await _screenSetsConfigurator.Apply(target!, project.ScreenSetsResource.Resource);
 
         return new();
-
-        static string ProjectFolderScope(bool isTemplate)
-            => isTemplate ? "_templates" : "_sites";
     }
 }

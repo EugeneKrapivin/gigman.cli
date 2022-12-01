@@ -24,12 +24,19 @@ public class AccountsSchemaResource : ProjectResource<AccountsSchema>, IPersista
 
     public static async Task<AccountsSchemaResource> Load(string path)
     {
-        var confPath = Path.Combine(path, ConfigFileName);
-        
-        if (!File.Exists(confPath))
-            return null;
+        var confPath = Path.Combine(path, _folderName, ConfigFileName);
 
-        var onDisk = JsonSerializer.Deserialize<OnDiskModel>(await File.ReadAllTextAsync(confPath));
+        if (!File.Exists(confPath))
+        {
+            return Default();
+        }
+
+        var onDisk = JsonSerializer.Deserialize<OnDiskModel>(await File.ReadAllTextAsync(confPath), GlobalUsings.JsonSerializerOptions);
+
+        if (onDisk is null) 
+        { 
+            return Default(); 
+        }
 
         var r = new AccountsSchema
         {
@@ -46,12 +53,23 @@ public class AccountsSchemaResource : ProjectResource<AccountsSchema>, IPersista
         };
     }
 
+    private static AccountsSchemaResource Default()
+    {
+        return new AccountsSchemaResource
+        {
+            Resource = new()
+        };
+    }
+
     private static async Task<T> GetSchemaFromFile<T>(string filePath)
+        where T : new()
     {
         if (!File.Exists(filePath))
-            return default;
+            return new T();
+        
+        var ser = JsonSerializer.Deserialize<T>(await File.ReadAllTextAsync(filePath));
 
-        return JsonSerializer.Deserialize<T>(await File.ReadAllTextAsync(filePath));
+        return ser ?? new T();
     }
 
     public async Task<string> PersistToDisk(string projectPath)
@@ -80,7 +98,7 @@ public class AccountsSchemaResource : ProjectResource<AccountsSchema>, IPersista
         };
 
         var content = JsonSerializer.Serialize(conf, GlobalUsings.JsonSerializerOptions);
-        var path = Path.Combine(projectPath, ConfigFileName);
+        var path = Path.Combine(folderPath, ConfigFileName);
 
         await File.WriteAllTextAsync(path, content);
 
@@ -88,7 +106,7 @@ public class AccountsSchemaResource : ProjectResource<AccountsSchema>, IPersista
 
         static string SerializeWithSchema<T>(T source, string schemaUrl)
         {
-            var obj = JsonObject.Parse(JsonSerializer.Serialize(source));
+            var obj = JsonObject.Parse(JsonSerializer.Serialize(source))!;
             obj["$schema"] = schemaUrl;
 
             return obj.ToJsonString(GlobalUsings.JsonSerializerOptions) ?? string.Empty;
@@ -99,8 +117,8 @@ public class AccountsSchemaResource : ProjectResource<AccountsSchema>, IPersista
 
     private class OnDiskModel
     {
-        public string InheritFrom { get; set; }
-        public Dictionary<string, string> Schemas { get; set; }
+        public string? InheritFrom { get; set; }
+        public Dictionary<string, string> Schemas { get; set; } = new();
     }
 
 }

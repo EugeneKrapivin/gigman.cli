@@ -4,7 +4,7 @@ public interface IContextService
 {
     WorkspaceContext SetContext(string context);
 
-    WorkspaceContext GetCurrentContext();
+    WorkspaceContext? GetCurrentContext();
 
     ContextModel GetAllContexts();
 
