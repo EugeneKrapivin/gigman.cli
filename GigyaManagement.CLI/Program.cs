@@ -19,7 +19,7 @@ var root = RootCommandFactory.CreateRootCommand(sp, PrintHeaderAsync);
 
 if (args.Length == 0)
 {
-    args = new[] { "-h" };
+    args = new[] { "site","apply","--self","-e","dev","-s","eugene_test_sites" };
 }
 
 await root.InvokeAsync(args);
@@ -46,7 +46,7 @@ static ServiceProvider Bootstrap()
 
     services.AddSingleton<ICommandFactory, SiteCommandFactory>();
     services.AddSingleton<ICommandFactory, ContextCommandFactory>();
-    services.AddSingleton<ICommandFactory, ScaffoldCommandFactory>();
+    services.AddSingleton<ICommandFactory, TemplateCommandFactory>();
     services.AddSingleton<ICommandFactory, CreateCommandFactory>();
 
     var sp = services.BuildServiceProvider();

@@ -6,43 +6,45 @@ using System.CommandLine;
 
 namespace GigyaConfigCLI.Factories;
 
-public class ScaffoldCommandFactory : ICommandFactory
+public class TemplateCommandFactory : ICommandFactory
 {
     private readonly IMediator _mediator;
 
-    public ScaffoldCommandFactory(IMediator mediator)
+    public TemplateCommandFactory(IMediator mediator)
     {
         _mediator = mediator;
     }
 
     public Command CreateCommand()
     {
-        var command = new Command("scaffold", "attempts to scrape an existing site");
+        var command = new Command("template", "attempts to scrape an existing site")
+        {
+            CreateTemplateSubCommand()
+        };
 
-        command.Add(CreateScaffoldTemplateCommand());
-        
         // TODO: make as a switch on the scaffold command
         //command.Add(CreateScaffoldForManageCommand());
 
         return command;
     }
 
-    private Command CreateScaffoldTemplateCommand()
+    private Command CreateTemplateSubCommand()
     {
         var apiKeyOption = new Option<string>(
             new[] { "--apikey", "-k" },
             "the target apikey for scaffolding");
 
-        var templateSubCommand = new Command("template", "scaffold target site for templating")
+        var templateSubCommand = new Command("scaffold", "scaffold target site for templating")
         {
             apiKeyOption
         };
 
         templateSubCommand.SetHandler(async (string apikey) => 
         {
-            var scaffoldResult = await _mediator.Send(new ScrapeSiteRequest
+            var scaffoldResult = await _mediator.Send(new ScrapeTemlateRequest
             {
-                ApiKey = apikey
+                ApiKey = apikey,
+                IsTemplate = true
             });
 
             // TODO: printout scaffold project

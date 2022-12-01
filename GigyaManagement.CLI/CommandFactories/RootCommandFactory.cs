@@ -10,7 +10,7 @@ public static class RootCommandFactory
 {
     public static Parser CreateRootCommand(IServiceProvider sp, Func<IConsole, Task> preHandle)
     {
-        var logOpt = CreateLogLevelOption();
+        //var logOpt = CreateLogLevelOption();
 
         var commandFactories = sp.GetServices<ICommandFactory>();
 
@@ -27,7 +27,7 @@ public static class RootCommandFactory
             root.AddCommand(factory.CreateCommand());
         }
 
-        root.AddGlobalOption(logOpt);
+        //root.AddGlobalOption(logOpt);
         builder.AddMiddleware(ctx =>
         {
             //var lvl = ctx.ParseResult.GetValueForOption(logOpt);

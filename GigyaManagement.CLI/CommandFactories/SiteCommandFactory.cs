@@ -20,7 +20,7 @@ public class SiteCommandFactory : ICommandFactory
     }
     public Command CreateCommand()
     {
-        var command = new Command("site", "site oriented command");
+        var command = new Command("site", "manage sites");
 
         var listCommand = CreateListCommand();
         var applyCommand = CreateApplyCommand();
@@ -35,11 +35,11 @@ public class SiteCommandFactory : ICommandFactory
 
     private Command CreatePullCommand()
     {
-        var scrapeCommand = new Command("pull", "pull an existing site form remote to local");
+        var scrapeCommand = new Command("pull", "pull an existing targetApikey form remote to local");
         
         var apiKeyOption = new Option<string>(new[] { "--apikey", "-k" }, "target apikey") { IsRequired = true };
-        var solutionNameOption = new Option<string>(new[] { "--name", "-n" }, "name under which the site would be stored in the workspace") { IsRequired = true };
-        var envOption = new Option<string>(new[] { "--env", "-e" }, () => "dev", "which environment the site is deployed at");
+        var solutionNameOption = new Option<string>(new[] { "--name", "-n" }, "name under which the targetApikey would be stored in the workspace") { IsRequired = true };
+        var envOption = new Option<string>(new[] { "--env", "-e" }, () => "dev", "which environment the targetApikey is deployed at");
         
         scrapeCommand.Add(apiKeyOption);
         scrapeCommand.Add(solutionNameOption);
@@ -60,29 +60,39 @@ public class SiteCommandFactory : ICommandFactory
 
     private Command CreateApplyCommand()
     {
-        var applyCommand = new Command("apply", "apply local site configurations to remote");
+        var applyCommand = new Command("apply", "apply local targetApikey configurations to remote");
         
         var solutionNameOption = new Option<string>(new[] { "--solution", "-s" }, "solution application will take effect on") { IsRequired = true };
         var envNameOption = new Option<string>(new[] { "--env", "-e" }, "envrionment application will take effect on") { IsRequired = true };
-        var siteNameOption = new Option<string>(new[] { "--target", "-t" }, "target apikey") { IsRequired = false };
+        var targetApiKey = new Option<string>(
+            new[] { "--target", "-t" }, 
+            "changes will be applied from the selected env on to the target apikey") 
+            { 
+                IsRequired = false 
+            };
+        var selfArgument = new Option<bool>(new string[] { "--self" }, () => true, "apply changes on same env") { Arity = ArgumentArity.ZeroOrOne };
 
-        applyCommand.Add(siteNameOption);
+        applyCommand.Add(targetApiKey);
         applyCommand.Add(envNameOption);
         applyCommand.Add(solutionNameOption);
+        applyCommand.Add(selfArgument);
 
 
         applyCommand.SetHandler(async (ctx) =>
         {
-            var site = ctx.BindingContext.ParseResult.GetValueForOption(siteNameOption)!;
+            var targetApikey = ctx.BindingContext.ParseResult.GetValueForOption(targetApiKey);
             var sol = ctx.BindingContext.ParseResult.GetValueForOption(solutionNameOption)!;
             var env = ctx.BindingContext.ParseResult.GetValueForOption(envNameOption)!;
+            var self = ctx.BindingContext.ParseResult.GetValueForOption(selfArgument)!;
 
-            try { 
+            try 
+            { 
                 await _mediator.Send(new ApplySiteChangesRequest
                 {
                     Solution = sol,
-                    Environment = site,
-                    IsTemplate = false
+                    Environment = env,
+                    SelfApply = self,
+                    TargetApiKey = self ? null : targetApikey
                 });
 
                 ctx.Console.WriteLine("changes applied");
@@ -93,6 +103,7 @@ public class SiteCommandFactory : ICommandFactory
                 ctx.Console.Error.WriteLine(ex.Message);
             }
         });
+
         return applyCommand;
     }
 
@@ -104,7 +115,7 @@ public class SiteCommandFactory : ICommandFactory
             var sitesWorkspace = Path.Combine(_partnerContext.Workspace, "_sites");
             if (!Directory.Exists(sitesWorkspace) || !Directory.GetDirectories(sitesWorkspace).Any())
             {
-                ctx.Console.Error.WriteLine("There are no site in current workspace");
+                ctx.Console.Error.WriteLine("There are no targetApikey in current workspace");
                 ctx.ExitCode = -1;
                 return;
             }

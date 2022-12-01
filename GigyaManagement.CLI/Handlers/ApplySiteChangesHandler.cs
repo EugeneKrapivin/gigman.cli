@@ -14,9 +14,8 @@ public class ApplySiteChangesRequest : IRequest<ApplySiteChangesResult>
     public required string Environment { get; init; }
 
     public string? TargetApiKey { get; set; } = null;
+    
     public bool SelfApply { get; set; } = true;
-
-    public bool IsTemplate { get; internal set; }
 }
 
 public class ApplySiteChangesResult
@@ -48,7 +47,7 @@ public class ApplySiteChangesHandler : IRequestHandler<ApplySiteChangesRequest, 
 
     public async ValueTask<ApplySiteChangesResult> Handle(ApplySiteChangesRequest request, CancellationToken cancellationToken)
     {
-        var siteFolder = Path.Combine(_context.Workspace);
+        var siteFolder = Path.Combine(_context.Workspace, "_sites", request.Solution);
 
         var solution = await _projectManager.LoadSolution(siteFolder);
 
@@ -68,7 +67,7 @@ public class ApplySiteChangesHandler : IRequestHandler<ApplySiteChangesRequest, 
 
         if (project.SiteConfigResource?.Resource is not null) await _siteConfigConfigurator.Apply(target!, project.SiteConfigResource.Resource);
         if (project.AccountsSchemaResource?.Resource is not null) await _accountsSchemaConfigurator.Apply(target!, project.AccountsSchemaResource.Resource);
-        if (project.ScreenSetsResource?.Resource is not null) await _screenSetsConfigurator.Apply(target!, project.ScreenSetsResource.Resource);
+        //if (project.ScreenSetsResource?.Resource is not null) await _screenSetsConfigurator.Apply(target!, project.ScreenSetsResource.Resource);
 
         return new();
     }
