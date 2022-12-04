@@ -20,6 +20,7 @@ var root = RootCommandFactory.CreateRootCommand(sp, PrintHeaderAsync);
 if (args.Length == 0)
 {
     args = new[] { "-h" };
+    args = new[] { "site", "apply", "-s", "evgenekr-pc_parentsite_au1.com", "-e", "primary" };
 }
 
 await root.InvokeAsync(args);

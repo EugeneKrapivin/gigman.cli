@@ -30,7 +30,7 @@ public class GigyaSchemaConfigurator : IGigyaResourceConfigurator<AccountsSchema
 
         await _gigyaService.ExecuteGigyaApi<GigyaResponse>("accounts.setSchema", 
             new Dictionary<string, string> { ["apikey"] = apikey }, 
-            new RequestModel { DataSchema = resource.DataSchema}.ToGigyaFormUrl(p => p != "dynamicSchema"));
+            new RequestModel { DataSchema = resource.DataSchema}.ToGigyaFormUrl(p => p == "dynamicSchema"));
     }
     private class RequestModel
     {
