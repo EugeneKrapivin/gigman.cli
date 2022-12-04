@@ -5,20 +5,24 @@ using GigyaManagement.CLI.Services.Template.ProjectModels.Resources;
 
 namespace GigyaManagement.CLI.Services.Project.ProjectModels;
 
-public class SiteProject
+public record Variable(string Path, string DefaultValue);
+
+public class TemplateProject
 {
     public Guid Id { get; set; } = Guid.NewGuid();
 
     public int Version { get; } = 1;
 
-    public string Environment { get; set; }
+    public static bool IsTemplate => true;
 
-    public string Apikey { get; set; }
-
-    public string? InheritFrom { get; set; }
+    [JsonIgnore]
+    public Dictionary<string, Variable> Variables { get; set; } = new();
 
     [JsonIgnore]
     public static string ConfigFileName => "site.project.json";
+
+    [JsonIgnore]
+    public static string VariablesFileName => "site.variables.json";
 
     #region resources
     [JsonIgnore]
@@ -52,7 +56,7 @@ public class SiteProject
     public IdentitySecurityResource? IdentitySecurityResource { get; set; }
     #endregion
 
-    public static async Task<SiteProject> Load(string path)
+    public static async Task<TemplateProject> Load(string path)
     {
         var file = path;
 
@@ -70,11 +74,11 @@ public class SiteProject
             file = Path.Combine(path, ConfigFileName);
         }
         var fileContent = await File.ReadAllTextAsync(file);
-        var project = JsonSerializer.Deserialize<SiteProject>(fileContent, GlobalUsings.JsonSerializerOptions);
+        var project = JsonSerializer.Deserialize<TemplateProject>(fileContent, GlobalUsings.JsonSerializerOptions);
 
         if (project is null)
         {
-            throw new Exception($"failed to parse the solution file \"{fileContent}\"");
+            throw new Exception($"failed to parse the template file \"{fileContent}\"");
         }
 
         project.SiteConfigResource = await SiteConfigResource.Load(path);
@@ -91,26 +95,32 @@ public class SiteProject
         return project;
     }
 
-    public async Task<(string env, string path)> PersistToDisk(string projectPath)
+    public async Task<string> PersistToDisk(string projectPath)
+    {
+        Directory.CreateDirectory(projectPath);
+
+        await SaveVariablesTable(projectPath);
+        await SaveSiteResources(projectPath);
+        await SaveProjectFile(projectPath);
+
+        return projectPath;
+    }
+
+    private async Task SaveProjectFile(string projectPath)
     {
         var content = await Serialize();
-
-        projectPath = Path.Combine(projectPath, Environment);
-        if (Directory.Exists(projectPath))
-        {
-            Console.WriteLine($"Warning: environment \"{Environment}\" already exists in \"{projectPath}\", this action will overwrite its contents");
-        }
-        else
-        {
-            Directory.CreateDirectory(projectPath);
-        }
         var path = Path.Combine(projectPath, ConfigFileName);
 
-        File.WriteAllText(path, content);
+        await File.WriteAllTextAsync(path, content);
+    }
 
-        await SaveSiteResources(projectPath);
+    private async Task SaveVariablesTable(string projectPath)
+    {
+        var path = Path.Combine(projectPath, VariablesFileName);
 
-        return (Environment, projectPath);
+        var content = JsonSerializer.Serialize(Variables, GlobalUsings.JsonSerializerOptions);
+
+        await File.WriteAllTextAsync(path, content);
     }
 
     private async Task SaveSiteResources(string projectPath)

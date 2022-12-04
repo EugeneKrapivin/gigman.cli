@@ -51,8 +51,6 @@ public class ScrapeTemplateHandler : IRequestHandler<ScrapeTemlateRequest, Scrap
     {
         var gigProject = new TemplateProject
         {
-            IsTemplate = request.IsTemplate,
-            Apikey = request.ApiKey,
             SiteConfigResource = new SiteConfigResource { Resource = await _siteConfigConfigurator.Extract(request.ApiKey) },
             AccountsSchemaResource = new AccountsSchemaResource { Resource = await _accountsSchemaConfigurator.Extract(request.ApiKey) },
             ScreenSetsResource = new ScreenSetsResource { Resource = await _screenSetsConfigurator.Extract(request.ApiKey) },
@@ -70,11 +68,11 @@ public class ScrapeTemplateHandler : IRequestHandler<ScrapeTemlateRequest, Scrap
             throw new Exception("Context not set");
         }
 
-        var sitesPath = Path.Combine(_contextService.GetCurrentContext().Workspace, "_template");
+        var templatesFolder = Path.Combine(_contextService.GetCurrentContext().Workspace, "_template");
 
-        Directory.CreateDirectory(sitesPath);
+        Directory.CreateDirectory(templatesFolder);
             
-        await gigProject.PersistToDisk(sitesPath); // ensure folder structure is created
+        await gigProject.PersistToDisk(templatesFolder); // ensure folder structure is created
       
         return new ScrapeTemplateResult();
 

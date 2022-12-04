@@ -54,7 +54,6 @@ public class ScrapeSiteHandler : IRequestHandler<ScrapeSiteRequest, ScrapeSiteRe
     {
         var gigProject = new SiteProject
         {
-            IsTemplate = request.IsTemplate,
             Environment = request.Environment,
             Apikey = request.ApiKey,
             SiteConfigResource = new SiteConfigResource { Resource = await _siteConfigConfigurator.Extract(request.ApiKey) },

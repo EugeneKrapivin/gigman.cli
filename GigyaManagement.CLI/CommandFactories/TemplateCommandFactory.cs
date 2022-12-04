@@ -21,10 +21,7 @@ public class TemplateCommandFactory : ICommandFactory
         {
             CreateTemplateSubCommand()
         };
-
-        // TODO: make as a switch on the scaffold command
-        //command.Add(CreateScaffoldForManageCommand());
-
+       
         return command;
     }
 
@@ -43,8 +40,7 @@ public class TemplateCommandFactory : ICommandFactory
         {
             var scaffoldResult = await _mediator.Send(new ScrapeTemlateRequest
             {
-                ApiKey = apikey,
-                IsTemplate = true
+                ApiKey = apikey
             });
 
             // TODO: printout scaffold project
@@ -52,19 +48,5 @@ public class TemplateCommandFactory : ICommandFactory
         }, apiKeyOption);
 
         return templateSubCommand;
-    }
-
-    private Command CreateScaffoldForManageCommand()
-    {
-        var apiKeyOption = new Option<string>(
-            new[] { "apikey", "k" },
-            "the target apikey for scaffolding");
-
-        var manageSubCommand = new Command("manage", "scaffold an existing site for management")
-        {
-            apiKeyOption
-        };
-
-        return manageSubCommand;
     }
 }

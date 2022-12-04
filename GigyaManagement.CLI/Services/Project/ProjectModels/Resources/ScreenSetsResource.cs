@@ -13,6 +13,11 @@ public class ScreenSetsResource : ProjectResource<ScreenSetsConfig>, IPersistabl
     public static async Task<ScreenSetsResource> Load(string path)
     {
         path = Path.Combine(path, _folder);
+        
+        if (!File.Exists(Path.Combine(path, ConfigFileName)))
+        {
+            return null;
+        }
 
         var resourceConfigContent = await File.ReadAllTextAsync(Path.Combine(path, ConfigFileName));
         var resource = JsonSerializer.Deserialize<ScreenSetsConfigOnDiskModel>(resourceConfigContent, GlobalUsings.JsonSerializerOptions)!;
