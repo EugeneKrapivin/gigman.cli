@@ -5,6 +5,7 @@ using Mediator;
 
 using System.CommandLine;
 using System.CommandLine.IO;
+using System.Xml.Schema;
 
 namespace GigyaConfigCLI.Factories;
 
@@ -62,8 +63,18 @@ public class SiteCommandFactory : ICommandFactory
     {
         var applyCommand = new Command("apply", "apply local targetApikey configurations to remote");
         
-        var solutionNameOption = new Option<string>(new[] { "--solution", "-s" }, "solution application will take effect on") { IsRequired = true };
-        var envNameOption = new Option<string>(new[] { "--env", "-e" }, "envrionment application will take effect on") { IsRequired = true };
+        var solutionNameOption = new Option<string?>(new[] { "--solution", "-s" }, () =>
+        {
+            var curDir = Directory.GetCurrentDirectory();
+            var sol = Directory.GetFiles("site.solution.json");
+            if (sol.Any())
+            {
+                return Path.GetDirectoryName(curDir);
+            }
+            return null;
+
+        }, "solution application will take effect on") { IsRequired = true };
+        var envNameOption = new Option<string>(new[] { "--env", "-e" }, "from which environment to take the configuration") { IsRequired = true };
         var targetApiKey = new Option<string>(
             new[] { "--target", "-t" }, 
             "changes will be applied from the selected env on to the target apikey") 
@@ -84,6 +95,13 @@ public class SiteCommandFactory : ICommandFactory
             var sol = ctx.BindingContext.ParseResult.GetValueForOption(solutionNameOption)!;
             var env = ctx.BindingContext.ParseResult.GetValueForOption(envNameOption)!;
             var self = ctx.BindingContext.ParseResult.GetValueForOption(selfArgument)!;
+
+            if (sol == null)
+            {
+                ctx.ExitCode = -1;
+                ctx.Console.Error.WriteLine("solution name wasn't passed or not found in local directory");
+                return;
+            }
 
             try 
             { 
