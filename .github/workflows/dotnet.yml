@@ -17,12 +17,15 @@ jobs:
         include:
           - os: macos-latest
             RID: osx-x64
+            BIN: gigman
 
           - os: ubuntu-latest
             RID: linux-x64
+            BIN: gigman
             
           - os: windows-latest
             RID: win-x64
+            BIN: gigman.exe
     steps:
     - uses: actions/checkout@v3
     - name: Setup .NET
@@ -43,5 +46,5 @@ jobs:
         # Artifact name
         name: executable for ${{matrix.RID}}
         # A file, directory or wildcard pattern that describes what to upload
-        path: ./publish/net7.0/${{matrix.RID}}/publish/gigman*
+        path: ./publish/net7.0/${{matrix.RID}}/publish/${{matrix.BIN}}
         retention-days: 0 # optional
