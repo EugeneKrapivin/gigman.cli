@@ -11,8 +11,12 @@ public class ContextService : IContextService
 
     public ContextService()
     {
-        var folder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        _contextFile = Path.Combine(folder, ".gigman_workspaces", _configFile);
+        var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".gigman_workspaces");
+        
+        if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
+
+        _contextFile = Path.Combine(folder, _configFile);
+        
         if (!File.Exists(_contextFile))
         {
             var file = File.Create(_contextFile);
