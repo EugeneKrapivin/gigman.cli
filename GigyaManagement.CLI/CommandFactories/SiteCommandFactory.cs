@@ -66,14 +66,14 @@ public class SiteCommandFactory : ICommandFactory
         var solutionNameOption = new Option<string?>(new[] { "--solution", "-s" }, () =>
         {
             var curDir = Directory.GetCurrentDirectory();
-            var sol = Directory.GetFiles("site.solution.json");
+            var sol = Directory.GetFiles(".", "site.solution.json");
             if (sol.Any())
             {
-                return Path.GetDirectoryName(curDir);
+                return Path.GetFileName(curDir);
             }
             return null;
 
-        }, "solution application will take effect on") { IsRequired = true };
+        }, "solution application will take effect on") { IsRequired = false };
         var envNameOption = new Option<string>(new[] { "--env", "-e" }, "from which environment to take the configuration") { IsRequired = true };
         var targetApiKey = new Option<string>(
             new[] { "--target", "-t" }, 
