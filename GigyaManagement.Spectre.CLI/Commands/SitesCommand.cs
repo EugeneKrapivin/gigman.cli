@@ -9,7 +9,7 @@ using GigyaManagement.Spectre.CLI.Commands.Abstractions;
 
 namespace GigyaManagement.Spectre.CLI.Commands;
 
-public sealed class SiteCommandRegistrar : IRegisterCommands
+internal sealed class SiteCommandRegistrar : IRegisterCommands
 {
     public IConfigurator RegisterCommand(IConfigurator configurator)
     {
@@ -29,7 +29,7 @@ public sealed class SiteCommandRegistrar : IRegisterCommands
     }
 }
 
-public sealed class ListSitesCommand : AsyncCommand
+internal sealed class ListSitesCommand : AsyncCommand
 {
     private readonly WorkspaceContext _partnerContext;
     private readonly IMediator _mediator;
@@ -58,7 +58,7 @@ public sealed class ListSitesCommand : AsyncCommand
     }
 }
 
-public sealed class ApplyToSiteCommand : AsyncCommand<ApplyToSiteCommand.Settings>
+internal sealed class ApplyToSiteCommand : AsyncCommand<ApplyToSiteCommand.Settings>
 {
     private readonly WorkspaceContext _partnerContext;
     private readonly IMediator _mediator;
@@ -120,7 +120,7 @@ public sealed class ApplyToSiteCommand : AsyncCommand<ApplyToSiteCommand.Setting
     }
 }
 
-public sealed class PullSiteCommand : AsyncCommand<PullSiteCommand.Settings>
+internal sealed class PullSiteCommand : AsyncCommand<PullSiteCommand.Settings>
 {
     private readonly IMediator _mediator;
 

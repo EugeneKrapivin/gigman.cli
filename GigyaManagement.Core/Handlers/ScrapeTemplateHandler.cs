@@ -65,9 +65,12 @@ public class ScrapeTemplateHandler : IRequestHandler<ScrapeTemlateRequest, Scrap
 
         Directory.CreateDirectory(templatesFolder);
             
-        await gigProject.PersistToDisk(templatesFolder); // ensure folder structure is created
+        var target = await gigProject.PersistToDisk(templatesFolder); // ensure folder structure is created
       
-        return new ScrapeTemplateResult();
+        return new ScrapeTemplateResult()
+        {
+            ProjectPath = target
+        };
 
     }
 }
