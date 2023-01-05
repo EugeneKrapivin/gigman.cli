@@ -3,21 +3,14 @@ using GigyaManagement.CLI.Services.Project.ProjectModels;
 
 namespace GigyaManagement.CLI.Services.Template;
 
-public interface IProjectManager
-{
-    public Task<GigyaSolution> LoadSolution(string solutionPath);
-}
 
 public class ProjectManagerOptions
 {
     public string WorkspacePath { get; set; } = Directory.GetCurrentDirectory();
 }
 
-public class ProjectManager : IProjectManager
+public class ProjectManager
 {
-    const string _defaultTemplatesFolder = "_templates/";
-    const string _defaultSitesFolder = "_sites/";
-
     private readonly ProjectManagerOptions _projectManagerOptions;
     private readonly WorkspaceContext _partnerContext;
 
@@ -25,10 +18,5 @@ public class ProjectManager : IProjectManager
     {
         _projectManagerOptions = projectManagerOptions;
         _partnerContext = partnerContext;
-    }
-
-    public Task<GigyaSolution> LoadSolution(string solutionPath)
-    {
-        return GigyaSolution.Load(solutionPath);
     }
 }

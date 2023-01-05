@@ -53,7 +53,7 @@ public class SiteCommandFactory : ICommandFactory
                 ApiKey = apikey,
                 IsTemplate = false,
                 Environment = env,
-                SolutionName = solutionName
+                SiteName = solutionName
             });
         }, apiKeyOption, solutionNameOption, envOption);
         return scrapeCommand;
@@ -69,7 +69,7 @@ public class SiteCommandFactory : ICommandFactory
             var sol = Directory.GetFiles(".", "site.solution.json");
             if (sol.Any())
             {
-                return Path.GetFileName(curDir);
+                return Path.GetDirectoryName(curDir);
             }
             return null;
 

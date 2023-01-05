@@ -1,6 +1,7 @@
 ﻿using GigyaManagement.CLI.Services.Context;
 using GigyaManagement.CLI.Services.GigyaApi;
 using GigyaManagement.CLI.Services.GigyaApi.Models;
+using GigyaManagement.CLI.Services.Project.ProjectModels;
 using GigyaManagement.CLI.Services.Template;
 
 using Mediator;
@@ -29,27 +30,29 @@ public class ApplySiteChangesHandler : IRequestHandler<ApplySiteChangesRequest, 
     private readonly IGigyaResourceConfigurator<AccountsSchema, string> _accountsSchemaConfigurator;
     private readonly IGigyaResourceConfigurator<ScreenSetsConfig, string> _screenSetsConfigurator;
     private readonly WorkspaceContext _context;
-    private readonly IProjectManager _projectManager;
 
     public ApplySiteChangesHandler(
         IGigyaResourceConfigurator<SiteConfig, string> siteConfigConfigurator,
         IGigyaResourceConfigurator<AccountsSchema, string> accountsSchemaConfigurator,
         IGigyaResourceConfigurator<ScreenSetsConfig, string> screenSetsConfigurator,
-        WorkspaceContext context,
-        IProjectManager projectManager)
+        WorkspaceContext context)
     {
         _siteConfigConfigurator = siteConfigConfigurator;
         _accountsSchemaConfigurator = accountsSchemaConfigurator;
         _screenSetsConfigurator = screenSetsConfigurator;
-        _context = context;
-        _projectManager = projectManager;
     }
 
     public async ValueTask<ApplySiteChangesResult> Handle(ApplySiteChangesRequest request, CancellationToken cancellationToken)
     {
         var siteFolder = Path.Combine(_context.Workspace, "_sites", request.Solution);
 
-        var solution = await _projectManager.LoadSolution(siteFolder);
+        // dirty trick - if solution contains a valid path to a solution folder - use that folder as root for operations for apply
+        if (File.Exists(Path.Combine(request.Solution, "site.solution.json")))
+        {
+            siteFolder = request.Solution;
+        }
+
+        var solution = await GigyaSolution.Load(siteFolder);
 
         var project = solution.Environments.SingleOrDefault(x => x.Environment == request.Environment);
         

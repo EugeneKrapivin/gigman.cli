@@ -1,15 +1,18 @@
-﻿using GigyaManagement.CLI.Services.Context;
+﻿using System;
+
+using GigyaManagement.CLI.Services.Context;
 using GigyaManagement.CLI.Services.GigyaApi;
 using GigyaManagement.CLI.Services.GigyaApi.Models;
 using GigyaManagement.CLI.Services.Project.ProjectModels;
 using GigyaManagement.CLI.Services.Template;
+using GigyaManagement.CLI.Services.Template.ProjectModels;
 using GigyaManagement.CLI.Services.Template.ProjectModels.Resources;
 
 using Mediator;
 
 namespace GigyaManagement.CLI.Handlers;
 
-public class ScrapeTemlateRequest : IRequest<ScrapeTemplateResult>
+public class ScrapeSiteRequest : IRequest<ScrapeSiteResult>
 {
     public string ApiKey { get; set; }
 
@@ -17,40 +20,39 @@ public class ScrapeTemlateRequest : IRequest<ScrapeTemplateResult>
 
     public string Environment { get; set; }
 
-    public string SolutionName { get; set; }
+    public string SiteName { get; set; }
 }
 
-public class ScrapeTemplateResult
+public class ScrapeSiteResult
 {
     public string ProjectPath { get; internal set; }
 }
 
-public class ScrapeTemplateHandler : IRequestHandler<ScrapeTemlateRequest, ScrapeTemplateResult>
+public class ScrapeSiteHandler : IRequestHandler<ScrapeSiteRequest, ScrapeSiteResult>
 {
     private readonly IGigyaResourceConfigurator<SiteConfig, string> _siteConfigConfigurator;
     private readonly IGigyaResourceConfigurator<AccountsSchema, string> _accountsSchemaConfigurator;
     private readonly IGigyaResourceConfigurator<ScreenSetsConfig, string> _screenSetsConfigurator;
-    private readonly IProjectManager _projectManager;
     private readonly IContextService _contextService;
 
-    public ScrapeTemplateHandler(
+    public ScrapeSiteHandler(
         IGigyaResourceConfigurator<SiteConfig, string> siteConfigConfigurator,
         IGigyaResourceConfigurator<AccountsSchema, string> accountsSchemaConfigurator,
         IGigyaResourceConfigurator<ScreenSetsConfig, string> screenSetsConfigurator,
-        IProjectManager projectManager,
         IContextService contextService)
     {
         _siteConfigConfigurator = siteConfigConfigurator;
         _accountsSchemaConfigurator = accountsSchemaConfigurator;
         _screenSetsConfigurator = screenSetsConfigurator;
-        _projectManager = projectManager;
         _contextService = contextService;
     }
 
-    public async ValueTask<ScrapeTemplateResult> Handle(ScrapeTemlateRequest request, CancellationToken cancellationToken)
+    public async ValueTask<ScrapeSiteResult> Handle(ScrapeSiteRequest request, CancellationToken cancellationToken)
     {
-        var gigProject = new TemplateProject
+        var gigProject = new SiteProject
         {
+            Environment = request.Environment,
+            Apikey = request.ApiKey,
             SiteConfigResource = new SiteConfigResource { Resource = await _siteConfigConfigurator.Extract(request.ApiKey) },
             AccountsSchemaResource = new AccountsSchemaResource { Resource = await _accountsSchemaConfigurator.Extract(request.ApiKey) },
             ScreenSetsResource = new ScreenSetsResource { Resource = await _screenSetsConfigurator.Extract(request.ApiKey) },
@@ -68,13 +70,30 @@ public class ScrapeTemplateHandler : IRequestHandler<ScrapeTemlateRequest, Scrap
             throw new Exception("Context not set");
         }
 
-        var templatesFolder = Path.Combine(_contextService.GetCurrentContext().Workspace, "_template");
+        var collectionFolder = request.IsTemplate ? "_template" : "_sites";
 
-        Directory.CreateDirectory(templatesFolder);
-            
-        await gigProject.PersistToDisk(templatesFolder); // ensure folder structure is created
-      
-        return new ScrapeTemplateResult();
+        var sitesPath = Path.Combine(_contextService.GetCurrentContext().Workspace, collectionFolder);
+
+        var solutionPath = Path.Combine(sitesPath, request.SiteName);
+        GigyaSolution solution;
+        if (Directory.Exists(solutionPath))
+        {
+            solution = await GigyaSolution.Load(solutionPath);
+        }
+        else
+        {
+            Directory.CreateDirectory(solutionPath);
+            solution = GigyaSolution.New(request.SiteName, solutionPath);
+            await solution.PersistToDisk(); // ensure folder structure is created
+        }
+
+        solution.Add(gigProject);
+        await solution.PersistToDisk();
+
+        return new ScrapeSiteResult()
+        {
+            ProjectPath = solutionPath
+        };
 
     }
 }

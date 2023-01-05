@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Text.Json;
 
 namespace GigyaManagement.CLI.Services.Context;
 
@@ -19,8 +20,6 @@ public class ContextService : IContextService
         
         if (!File.Exists(_contextFile))
         {
-            var file = File.Create(_contextFile);
-            file.Close();
             _context = new();
             Persist();
         }
@@ -40,12 +39,12 @@ public class ContextService : IContextService
         {
             return new ContextModel();
         }
-
-        using var file = File.OpenRead(_contextFile);
+        Console.WriteLine($"reading {_contextFile}");
+        var file = File.ReadAllText(_contextFile);
 
         if (file.Length > 0)
         {
-            var ctx = JsonSerializer.Deserialize<ContextModel>(new StreamReader(file).BaseStream);
+            var ctx = JsonSerializer.Deserialize<ContextModel>(file, GlobalUsings.JsonSerializerOptions);
 
             if (ctx == null) throw new Exception("Failed to parse context");
 

@@ -20,7 +20,6 @@ var root = RootCommandFactory.CreateRootCommand(sp, PrintHeaderAsync);
 if (args.Length == 0)
 {
     args = new[] { "-h" };
-    //args = new[] { "site", "apply", "-e", "primary", "-t", "3_I0hI7_M6zfXEmJxRE4YW-i_Z6Np2x42Wchmp0UlQgbOShymhG_pOsuT7Pu3B7SGf" };
 }
 
 await root.InvokeAsync(args);
@@ -39,9 +38,6 @@ static ServiceProvider Bootstrap()
     services.AddSingleton<IGigyaResourceConfigurator<ScreenSetsConfig, string>, ScreenSetsConfigurator>();
     
     services.AddSingleton<IContextService, ContextService>();
-
-    services.AddSingleton<ProjectManagerOptions>();
-    services.AddSingleton<IProjectManager, ProjectManager>();
 
     services.AddSingleton(sp => sp.GetService<IContextService>()!.GetCurrentContext());
 

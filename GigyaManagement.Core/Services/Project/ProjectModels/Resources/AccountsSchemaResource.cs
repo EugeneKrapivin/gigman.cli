@@ -12,7 +12,7 @@ public class AccountsSchemaResource : ProjectResource<AccountsSchema>, IPersista
 {
     const string _folderName = "accounts_schemas";
     const string _dataSchemaFile = "schema.data.json";
-    const string _dataJsonSchema = "https://gist.githubusercontent.com/EugeneKrapivin/a8adfe1bbac7b0bf80497a456ea91822/raw/dd1fc214c4482c3fe99afcb5e376cf8e83a60123/schema.data.json";
+    const string _dataJsonSchema = "https://gist.githubusercontent.com/EugeneKrapivin/a8adfe1bbac7b0bf80497a456ea91822/raw/fe37ae3e097317a27e5aea193d4ba9ef683420fe/schema.data.json";
     const string _profileSchemaFile = "schema.profile.json";
     const string _subscriptionSchemaFile = "schema.subscriptions.json";
     const string _subsctiptionsJsonSchema = "https://gist.githubusercontent.com/EugeneKrapivin/9196cb41eaf4568af5aa9ffbecd133bf/raw/86af60665816e62cbd3dfec1ef68cd489a4ecd1d/schema.subscriptions.json";
