@@ -44,7 +44,6 @@ static ServiceProvider Bootstrap()
     services.AddSingleton<ICommandFactory, SiteCommandFactory>();
     services.AddSingleton<ICommandFactory, ContextCommandFactory>();
     services.AddSingleton<ICommandFactory, TemplateCommandFactory>();
-    services.AddSingleton<ICommandFactory, CreateCommandFactory>();
 
     var sp = services.BuildServiceProvider();
     return sp;

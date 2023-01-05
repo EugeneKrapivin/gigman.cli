@@ -1,6 +1,6 @@
 ﻿using GigyaManagement.CLI.Services.Context;
 using GigyaManagement.Core;
-
+using GigyaManagement.Spectre.CLI.Commands.Abstractions;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
@@ -128,7 +128,7 @@ public sealed class CreateContextCommand : Command<CreateContextCommand.Settings
         }
         catch (Exception ex)
         {
-            AnsiConsole.WriteException(ex);
+            AnsiConsole.WriteException(ex, ExceptionFormats.ShortenEverything);
             return -1;
         }
 
@@ -169,7 +169,7 @@ public sealed class SetContextCommand : Command<SetContextCommand.Settings>
         }
         catch (Exception ex)
         {
-            AnsiConsole.WriteException(ex);
+            AnsiConsole.WriteException(ex, ExceptionFormats.ShortenEverything);
             return -1;
         }
 

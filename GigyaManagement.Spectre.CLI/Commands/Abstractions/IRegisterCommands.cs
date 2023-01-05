@@ -1,6 +1,6 @@
 ﻿using Spectre.Console.Cli;
 
-namespace GigyaManagement.Spectre.CLI.Commands;
+namespace GigyaManagement.Spectre.CLI.Commands.Abstractions;
 
 public interface IRegisterCommands
 {

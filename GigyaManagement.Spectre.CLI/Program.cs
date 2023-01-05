@@ -2,64 +2,82 @@
 using GigyaManagement.CLI.Services.GigyaApi;
 using GigyaManagement.CLI.Services.GigyaApi.Configurators;
 using GigyaManagement.CLI.Services.GigyaApi.Models;
+using GigyaManagement.CLI.Services.Template.ProjectModels.Resources;
 using GigyaManagement.Core.Exceptions;
 
-using GigyaManagement.Spectre.CLI;
 using GigyaManagement.Spectre.CLI.Commands;
+using GigyaManagement.Spectre.CLI.Commands.Abstractions;
+using GigyaManagement.Spectre.CLI.Infra;
 
 using Microsoft.Extensions.DependencyInjection;
 
+using Spectre.Console;
 using Spectre.Console.Cli;
 
 var services = new ServiceCollection();
 
-var sp = Bootstrap(services);
+services.Bootstrap();
 
-var typeRegistrar = new TypeRegistrar(sp);
+var typeRegistrar = new TypeRegistrar(services);
 
 var app = new CommandApp(typeRegistrar);
 
-CreateRootCommand(app);
+app.SetupCommandApp();
 
 app.RunAsync(args);
 
-static IServiceCollection Bootstrap(IServiceCollection services)
+
+file static class ServicesExtensions
 {
-    services.AddMediator();
-    services.AddSingleton<IRegisterCommands, SiteCommandRegistrar>();
-    services.AddSingleton<IRegisterCommands, ContextCommandRegistrar>();
-    
-    services.AddSingleton<IGigyaService, GigyaService>();
-    
-    services.AddSingleton<IGigyaResourceConfigurator<SiteConfig, string>, GigyaSiteConfigConfigurator>();
-    services.AddSingleton<IGigyaResourceConfigurator<AccountsSchema, string>, GigyaSchemaConfigurator>();
-    services.AddSingleton<IGigyaResourceConfigurator<ScreenSetsConfig, string>, ScreenSetsConfigurator>();
-
-    services.AddSingleton<IContextService, ContextService>();
-    services.AddSingleton(sp => sp.GetService<IContextService>()?.GetCurrentContext() switch
+    public static IServiceCollection Bootstrap(this IServiceCollection services)
     {
-        null => throw new ContextNotSetException(),
-        { } ctx => ctx,
-    });
+        services.AddMediator();
+        services.RegisterServices();
 
-    return services;
-}
- 
-static void CreateRootCommand(CommandApp app)
-{   
-    app.Configure(conf =>
+        return services;
+    }
+
+    public static IServiceCollection RegisterServices(this IServiceCollection services)
     {
-        conf.SetApplicationName("gigman");
+        services.AddSingleton<IGigyaService, GigyaService>();
 
-        var commandFactories = new IRegisterCommands[] 
-        { 
-            new ContextCommandRegistrar(), 
-            new SiteCommandRegistrar() 
-        };
+        services.AddSingleton<IGigyaResourceConfigurator<SiteConfig, string>, GigyaSiteConfigConfigurator>();
+        services.AddSingleton<IGigyaResourceConfigurator<AccountsSchema, string>, GigyaSchemaConfigurator>();
+        services.AddSingleton<IGigyaResourceConfigurator<ScreenSetsConfig, string>, ScreenSetsConfigurator>();
 
-        foreach (var factory in commandFactories)
+        services.AddSingleton<IContextService, ContextService>();
+        services.AddSingleton(sp => sp.GetService<IContextService>()?.GetCurrentContext() switch
         {
-            factory.RegisterCommand(conf);
-        }
-    });
+            null => throw new ContextNotSetException(),
+            { } ctx => ctx,
+        });
+
+        return services;
+    }
+}
+
+file static class CommandAppExtensions
+{ 
+    public static void SetupCommandApp(this CommandApp app)
+    => app.Configure(conf =>
+        {
+            conf.SetApplicationName("gigman");
+            
+            conf.SetExceptionHandler(ex =>
+            {
+                AnsiConsole.WriteException(ex, ExceptionFormats.ShortenEverything);
+                return -2;
+            });
+
+            var commandFactories = new IRegisterCommands[] 
+            { 
+                new ContextCommandRegistrar(), 
+                new SiteCommandRegistrar() 
+            };
+
+            foreach (var factory in commandFactories)
+            {
+                factory.RegisterCommand(conf);
+            }
+        });
 }

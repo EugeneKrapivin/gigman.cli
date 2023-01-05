@@ -5,6 +5,7 @@ using Mediator;
 using Spectre.Console;
 using GigyaManagement.CLI.Handlers;
 using Spectre.Console.Cli;
+using GigyaManagement.Spectre.CLI.Commands.Abstractions;
 
 namespace GigyaManagement.Spectre.CLI.Commands;
 
@@ -111,7 +112,7 @@ public sealed class ApplyToSiteCommand : AsyncCommand<ApplyToSiteCommand.Setting
         }
         catch (Exception ex)
         {
-            AnsiConsole.WriteException(ex);            
+            AnsiConsole.WriteException(ex, ExceptionFormats.ShortenEverything);            
             return -1;
         }
 
@@ -159,7 +160,7 @@ public sealed class PullSiteCommand : AsyncCommand<PullSiteCommand.Settings>
         }
         catch(Exception ex)
         {
-            AnsiConsole.WriteException(ex);
+            AnsiConsole.WriteException(ex, ExceptionFormats.ShortenEverything);
             return -1;
         }
     }
