@@ -1,9 +1,10 @@
 ﻿using GigyaManagement.CLI.Services.Context;
 using GigyaManagement.Core;
 
-using Spectre.Cli;
 using Spectre.Console;
+using Spectre.Console.Cli;
 
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 
 namespace GigyaManagement.Spectre.CLI.Commands;
@@ -12,18 +13,18 @@ public class ContextCommandRegistrar : IRegisterCommands
 {
     public IConfigurator RegisterCommand(IConfigurator configurator)
     {
-        configurator.AddBranch("workspaceContext", context =>
+        configurator.AddBranch("context", context =>
         {
-            context.SetDescription("Commands scoped for execution workspaceContext");
+            context.SetDescription("Commands scoped for execution context");
 
             context.AddCommand<ListContextsCommand>("list")
                 .WithDescription("Prints out a list of all configured contexts.");
             context.AddCommand<CurrentContextCommand>("current")
-                .WithDescription("Prints out the current selected workspaceContext.");
+                .WithDescription("Prints out the current selected context.");
             context.AddCommand<CreateContextCommand>("create")
-                .WithDescription("Creates a new workspaceContext. Note, newly created contexts are not automatically set as current.");
+                .WithDescription("Creates a new context. Note, newly created contexts are not automatically set as current.");
             context.AddCommand<SetContextCommand>("set")
-                .WithDescription("Select an existing workspaceContext as the current workspaceContext.");
+                .WithDescription("Select an existing context as the current context.");
         });
 
         return configurator;
@@ -42,9 +43,8 @@ public sealed class ListContextsCommand : Command
     public override int Execute(CommandContext context)
     {
         var contexts = _contextService.GetAllContexts();
-        var content = JsonSerializer.Serialize(contexts, GlobalUsings.JsonSerializerOptions);
         
-        AnsiConsole.WriteLine(content);
+        AnsiConsole.Write(contexts.AsJsonPanel("Contexts"));
 
         return 0;
     }
@@ -63,16 +63,13 @@ public sealed class CurrentContextCommand : Command
     {
         var current = _contextService.GetCurrentContext();
 
-        AnsiConsole.WriteLine($"Current workspaceContext:");
         if (current is null)
         {
-            AnsiConsole.WriteLine($"Context is not set");
+            AnsiConsole.MarkupLine($"[red]Context is not set[/]");
         }
         else
         {
-            var content = JsonSerializer.Serialize(current, GlobalUsings.JsonSerializerOptions);
-            
-            AnsiConsole.WriteLine(content);
+            AnsiConsole.Write(current.AsJsonPanel("Current context"));
         }
 
         return 0;
@@ -90,17 +87,20 @@ public sealed class CreateContextCommand : Command<CreateContextCommand.Settings
 
     public class Settings : CommandSettings
     {
-        [CommandArgument(0, "<workspaceContext name>")]
-        public string Name { get; set; }
-        
+        [CommandArgument(0, "<context name>")]
+        [Required]
+        public required string Name { get; init; }
+
+        [Required]
         [CommandArgument(1, "<userkey>")]
-        public string UserKey { get; set; }
+        public required string UserKey { get; init; }
 
+        [Required]
         [CommandArgument(2, "<secret>")] 
-        public string Secret { get; set; }
+        public required string Secret { get; init; }
 
-        [CommandArgument(3, "<workspace>")] 
-        public string Workspace { get; set; }
+        [CommandArgument(3, "[workspace]")] 
+        public string? Workspace { get; init; }
     }
     
     public override int Execute(CommandContext context, Settings settings)
@@ -115,7 +115,7 @@ public sealed class CreateContextCommand : Command<CreateContextCommand.Settings
             {
                 Name = name,
                 UserKey = userkey,
-                Secret = secret,
+                Secret = secret
             };
 
             if (!string.IsNullOrEmpty(workspace))
@@ -124,8 +124,7 @@ public sealed class CreateContextCommand : Command<CreateContextCommand.Settings
             }
 
             var added = _contextService.CreateNewContext(workspaceContext);
-            AnsiConsole.WriteLine($"Added \"{name}\" workspaceContext:");
-            AnsiConsole.WriteLine(JsonSerializer.Serialize(added, GlobalUsings.JsonSerializerOptions));
+            AnsiConsole.Write(added.AsJsonPanel($"""Added "{name}" context"""));
         }
         catch (Exception ex)
         {
@@ -148,18 +147,25 @@ public sealed class SetContextCommand : Command<SetContextCommand.Settings>
 
     public class Settings : CommandSettings
     {
-        [CommandArgument(0, "<workspaceContext name>")]
-        public string Name { get; set; }
+        [CommandArgument(0, "[context name]")]
+        public string Name { get; init; }
     }
 
     public override int Execute(CommandContext context, Settings settings)
     {
-        var name = settings.Name!;
+        var name = settings.Name;
+        if (string.IsNullOrEmpty(name))
+        {
+            var availableContexts = _contextService.GetAllContexts().DefinedContexts.Select( x => x.Name);
+            name = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                .Title("Select a context")
+                .AddChoices(availableContexts));
+        }
         try
         {
             var set = _contextService.SetContext(name);
-            AnsiConsole.WriteLine($"Setting \"{name}\" context as current");
-            AnsiConsole.WriteLine(JsonSerializer.Serialize(set, GlobalUsings.JsonSerializerOptions));
+            AnsiConsole.Write(set.AsJsonPanel($"""Setting "{name}" context as current"""));
         }
         catch (Exception ex)
         {

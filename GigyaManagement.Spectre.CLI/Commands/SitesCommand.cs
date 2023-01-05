@@ -1,18 +1,10 @@
 ﻿using GigyaManagement.CLI.Services.Context;
-using GigyaManagement.CLI.Services.Template.ProjectModels.Resources;
 
 using Mediator;
 
-using Spectre.Cli;
-
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Spectre.Console;
 using GigyaManagement.CLI.Handlers;
+using Spectre.Console.Cli;
 
 namespace GigyaManagement.Spectre.CLI.Commands;
 

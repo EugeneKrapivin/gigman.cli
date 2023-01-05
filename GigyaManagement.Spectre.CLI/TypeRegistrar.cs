@@ -1,15 +1,15 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-using Spectre.Cli;
+using Spectre.Console.Cli;
 
-namespace GigyaManagement.Spectre.CLI.Infra;
+namespace GigyaManagement.Spectre.CLI;
 
 public sealed class TypeRegistrar : ITypeRegistrar
 {
     private readonly IServiceCollection _builder;
 
     public IServiceProvider ServiceProvider { get; private set; }
-    
+
     public TypeRegistrar(IServiceCollection builder)
     {
         _builder = builder;

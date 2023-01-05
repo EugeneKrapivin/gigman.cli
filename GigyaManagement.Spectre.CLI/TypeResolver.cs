@@ -1,6 +1,6 @@
-﻿using Spectre.Cli;
+﻿using Spectre.Console.Cli;
 
-namespace GigyaManagement.Spectre.CLI.Infra;
+namespace GigyaManagement.Spectre.CLI;
 
 public sealed class TypeResolver : ITypeResolver, IDisposable
 {

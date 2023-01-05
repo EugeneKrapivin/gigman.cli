@@ -3,15 +3,13 @@ using GigyaManagement.CLI.Services.GigyaApi;
 using GigyaManagement.CLI.Services.GigyaApi.Configurators;
 using GigyaManagement.CLI.Services.GigyaApi.Models;
 using GigyaManagement.Core.Exceptions;
+
+using GigyaManagement.Spectre.CLI;
 using GigyaManagement.Spectre.CLI.Commands;
-using GigyaManagement.Spectre.CLI.Infra;
 
 using Microsoft.Extensions.DependencyInjection;
 
-using Spectre.Cli;
-using Spectre.Console;
-
-using System;
+using Spectre.Console.Cli;
 
 var services = new ServiceCollection();
 
@@ -21,7 +19,7 @@ var typeRegistrar = new TypeRegistrar(sp);
 
 var app = new CommandApp(typeRegistrar);
 
-CreateRootCommand(typeRegistrar.ServiceProvider, app);
+CreateRootCommand(app);
 
 app.RunAsync(args);
 
@@ -47,12 +45,18 @@ static IServiceCollection Bootstrap(IServiceCollection services)
     return services;
 }
  
-static void CreateRootCommand(IServiceProvider sp, CommandApp app)
-{
-    var commandFactories = sp.GetServices<IRegisterCommands>();
-    
+static void CreateRootCommand(CommandApp app)
+{   
     app.Configure(conf =>
     {
+        conf.SetApplicationName("gigman");
+
+        var commandFactories = new IRegisterCommands[] 
+        { 
+            new ContextCommandRegistrar(), 
+            new SiteCommandRegistrar() 
+        };
+
         foreach (var factory in commandFactories)
         {
             factory.RegisterCommand(conf);

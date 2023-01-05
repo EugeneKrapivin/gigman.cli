@@ -41,16 +41,14 @@ public class ContextService : IContextService
         {
             return new ContextModel();
         }
-        Console.WriteLine($"reading {_contextFile}");
+
         var file = File.ReadAllText(_contextFile);
 
         if (file.Length > 0)
         {
             var ctx = JsonSerializer.Deserialize<ContextModel>(file, GlobalUsings.JsonSerializerOptions);
 
-            if (ctx == null) throw new Exception("Failed to parse context");
-
-            return ctx;
+            return ctx ?? throw new Exception("Failed to parse context");
         }
         else
         {
