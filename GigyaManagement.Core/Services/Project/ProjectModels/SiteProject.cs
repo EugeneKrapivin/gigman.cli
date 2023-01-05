@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 
 using GigyaManagement.CLI.Services.Template.ProjectModels.Resources;
+using GigyaManagement.Core;
 
 namespace GigyaManagement.CLI.Services.Project.ProjectModels;
 
@@ -115,16 +116,24 @@ public class SiteProject
 
     private async Task SaveSiteResources(string projectPath)
     {
-        await SiteConfigResource?.PersistToDisk(projectPath);
-        await AccountsSchemaResource?.PersistToDisk(projectPath);
-        await ScreenSetsResource?.PersistToDisk(projectPath);
-        await IdentitySecurityResource?.PersistToDisk(projectPath);
-        await HostedPagesResource?.PersistToDisk(projectPath);
-        await FlowsResource?.PersistToDisk(projectPath);
-        await ExtensionsResource?.PersistToDisk(projectPath);
-        await EmailTemplatesResource?.PersistToDisk(projectPath);
-        await DataFlowsResource?.PersistToDisk(projectPath);
-        await SmsTemplatesResource?.PersistToDisk(projectPath);
+        var resources = new List<IPersist?>
+        {
+            SiteConfigResource,
+            AccountsSchemaResource,
+            ScreenSetsResource,
+            IdentitySecurityResource,
+            HostedPagesResource,
+            FlowsResource,
+            ExtensionsResource,
+            EmailTemplatesResource,
+            DataFlowsResource,
+            SmsTemplatesResource
+        };
+
+        foreach(var resource in resources.Where(x => x != null).Cast<IPersist>())
+        {
+            await resource.PersistToDisk(projectPath);
+        }
     }
 
     public Task<string> Serialize() => Task.FromResult(JsonSerializer.Serialize(this, GlobalUsings.JsonSerializerOptions));

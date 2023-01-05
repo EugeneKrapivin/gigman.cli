@@ -1,4 +1,6 @@
-﻿using System;
+﻿using GigyaManagement.Core;
+
+using System;
 using System.Text.Json;
 
 namespace GigyaManagement.CLI.Services.Context;

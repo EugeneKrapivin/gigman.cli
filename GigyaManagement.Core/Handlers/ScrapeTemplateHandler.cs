@@ -60,12 +60,8 @@ public class ScrapeTemplateHandler : IRequestHandler<ScrapeTemlateRequest, Scrap
             SmsTemplatesResource = new()
         };
 
-        if (_contextService.GetCurrentContext() == null)
-        {
-            throw new Exception("Context not set");
-        }
-
-        var templatesFolder = Path.Combine(_contextService.GetCurrentContext().Workspace, "_template");
+        var ctx = _contextService.GetCurrentContext() ?? throw new Exception("Context not set");
+        var templatesFolder = Path.Combine(ctx.Workspace, "_template");
 
         Directory.CreateDirectory(templatesFolder);
             

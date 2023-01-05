@@ -1,5 +1,6 @@
 ﻿using GigyaManagement.CLI;
 using GigyaManagement.CLI.Services.Context;
+using GigyaManagement.Core;
 
 using Microsoft.Extensions.Options;
 

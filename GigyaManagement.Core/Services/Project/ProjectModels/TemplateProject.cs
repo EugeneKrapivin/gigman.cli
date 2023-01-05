@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 
 using GigyaManagement.CLI.Services.Template.ProjectModels.Resources;
+using GigyaManagement.Core;
 
 namespace GigyaManagement.CLI.Services.Project.ProjectModels;
 

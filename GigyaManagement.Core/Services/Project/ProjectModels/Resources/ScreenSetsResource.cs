@@ -1,4 +1,5 @@
 ﻿using GigyaManagement.CLI.Services.GigyaApi.Models;
+using GigyaManagement.Core;
 
 using System.Text.Json;
 using System.Text.Json.Serialization;

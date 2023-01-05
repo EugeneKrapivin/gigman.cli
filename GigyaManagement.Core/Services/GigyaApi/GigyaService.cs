@@ -112,29 +112,27 @@ public class GigyaService : IGigyaService, IDisposable
 
 public sealed class GigyaCreateSiteResopnse : IGigyaResopnse
 {
-    public long SiteId { get; set; }
-    public string ApiKey { get; set; }
+    public required long SiteId { get; init; }
+    
+    public required string ApiKey { get; init; }
 
     [JsonPropertyName("callId")]
-    public string CallId { get; set; }
+    public required string CallId { get; set; }
 
     [JsonPropertyName("errorCode")]
-    public int ErrorCode { get; set; }
+    public required int ErrorCode { get; set; }
 
     [JsonPropertyName("errorDetails")]
-    public string ErrorDetails { get; set; }
+    public string? ErrorDetails { get; set; }
 
     [JsonPropertyName("errorMessage")]
-    public string ErrorMessage { get; set; }
-
-    [JsonPropertyName("apiVersion")]
-    public int ApiVersion { get; set; }
+    public string? ErrorMessage { get; set; }
 
     [JsonPropertyName("statusCode")]
     public int StatusCode { get; set; }
 
     [JsonPropertyName("statusReason")]
-    public string StatusReason { get; set; }
+    public string? StatusReason { get; set; }
 
     [JsonPropertyName("time")]
     public DateTime Time { get; set; }
@@ -169,17 +167,14 @@ public sealed class GigyaGetSiteConfig : SiteConfig, IGigyaResopnse
 
 public sealed class GigyaResponse : IGigyaResopnse
 {
-    [JsonPropertyName("callId")]
-    public string CallId { get; set; }
-
     [JsonPropertyName("errorCode")]
     public int ErrorCode { get; set; }
 
     [JsonPropertyName("errorDetails")]
-    public string ErrorDetails { get; set; }
+    public string? ErrorDetails { get; set; }
 
     [JsonPropertyName("errorMessage")]
-    public string ErrorMessage { get; set; }
+    public string? ErrorMessage { get; set; }
 
     [JsonPropertyName("apiVersion")]
     public int ApiVersion { get; set; }
@@ -199,26 +194,20 @@ public sealed class GigyaResponse : IGigyaResopnse
 
 public interface IGigyaResopnse
 {
-    [JsonPropertyName("callId")]
-    public string CallId { get;  }
-
     [JsonPropertyName("errorCode")]
     public int ErrorCode { get; }
 
     [JsonPropertyName("errorDetails")]
-    public string ErrorDetails { get;  }
+    public string? ErrorDetails { get;  }
 
     [JsonPropertyName("errorMessage")]
-    public string ErrorMessage { get;}
-
-    [JsonPropertyName("apiVersion")]
-    public int ApiVersion { get; }
+    public string? ErrorMessage { get;}
 
     [JsonPropertyName("statusCode")]
     public int StatusCode { get; }
 
     [JsonPropertyName("statusReason")]
-    public string StatusReason { get; }
+    public string? StatusReason { get; }
 
     [JsonPropertyName("time")]
     public DateTime Time { get; }

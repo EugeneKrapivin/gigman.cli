@@ -2,6 +2,7 @@
 using GigyaManagement.CLI.Services.GigyaApi;
 using GigyaManagement.CLI.Services.GigyaApi.Configurators;
 using GigyaManagement.CLI.Services.GigyaApi.Models;
+using GigyaManagement.Core.Exceptions;
 using GigyaManagement.Spectre.CLI.Commands;
 using GigyaManagement.Spectre.CLI.Infra;
 
@@ -37,7 +38,11 @@ static IServiceCollection Bootstrap(IServiceCollection services)
     services.AddSingleton<IGigyaResourceConfigurator<ScreenSetsConfig, string>, ScreenSetsConfigurator>();
 
     services.AddSingleton<IContextService, ContextService>();
-    services.AddSingleton(sp => sp.GetService<IContextService>()!.GetCurrentContext());
+    services.AddSingleton(sp => sp.GetService<IContextService>()?.GetCurrentContext() switch
+    {
+        null => throw new ContextNotSetException(),
+        { } ctx => ctx,
+    });
 
     return services;
 }

@@ -1,17 +1,10 @@
-﻿using GigyaManagement.CLI;
-using GigyaManagement.CLI.Services.Context;
-using GigyaManagement.CLI.Services.Template.ProjectModels.Resources;
+﻿using GigyaManagement.CLI.Services.Context;
+using GigyaManagement.Core;
 
 using Spectre.Cli;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
 using Spectre.Console;
-using GigyaManagement.Core;
+
+using System.Text.Json;
 
 namespace GigyaManagement.Spectre.CLI.Commands;
 

@@ -1,17 +1,21 @@
-﻿using System.IO;
+﻿using GigyaManagement.Core;
+
+using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace GigyaManagement.CLI.Services.Template.ProjectModels.Resources;
 
-public interface IPersistable
+public interface IPersist
 {
-    [JsonIgnore]
-    public static abstract string ConfigFileName { get; }
-
     public Task<string> Serialize();
 
     public Task<string> PersistToDisk(string projectPath);
+}
+public interface IPersistable : IPersist
+{
+    [JsonIgnore]
+    public static abstract string ConfigFileName { get; }
 }
 
 public interface ILoadable<T> where T: ILoadable<T>, IPersistable
