@@ -3,16 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33103.201
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GigyaManagement.CLI", "GigyaManagement.CLI\GigyaManagement.CLI.csproj", "{F7E4A6B3-5894-485C-BFEB-038B44953463}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0A5FF6FC-6E4F-4D6B-9587-A84E0C1EC849}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GigyaManagement.Spectre.CLI", "GigyaManagement.Spectre.CLI\GigyaManagement.Spectre.CLI.csproj", "{4133E673-9C6D-429F-BC16-8BC4F404A941}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GigyaManagement.Spectre.CLI", "GigyaManagement.Spectre.CLI\GigyaManagement.Spectre.CLI.csproj", "{4133E673-9C6D-429F-BC16-8BC4F404A941}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GigyaManagement.Core", "GigyaManagement.Core\GigyaManagement.Core.csproj", "{E124D5B6-B45F-4599-A9DE-17B1CF06B35B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GigyaManagement.Core", "GigyaManagement.Core\GigyaManagement.Core.csproj", "{E124D5B6-B45F-4599-A9DE-17B1CF06B35B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,10 +18,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F7E4A6B3-5894-485C-BFEB-038B44953463}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F7E4A6B3-5894-485C-BFEB-038B44953463}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F7E4A6B3-5894-485C-BFEB-038B44953463}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F7E4A6B3-5894-485C-BFEB-038B44953463}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4133E673-9C6D-429F-BC16-8BC4F404A941}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4133E673-9C6D-429F-BC16-8BC4F404A941}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4133E673-9C6D-429F-BC16-8BC4F404A941}.Release|Any CPU.ActiveCfg = Release|Any CPU

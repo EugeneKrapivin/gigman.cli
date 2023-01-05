@@ -69,7 +69,7 @@ file static class CommandAppExtensions
                 return -2;
             });
 
-            var commandFactories = new IRegisterCommands[] 
+            IRegisterCommands[] commandFactories = 
             { 
                 new ContextCommandRegistrar(), 
                 new SiteCommandRegistrar() 
