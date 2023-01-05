@@ -9,9 +9,9 @@ namespace GigyaManagement.Core.Exceptions;
 [Serializable]
 public class ContextNotSetException : Exception
 {
-	public ContextNotSetException() { }
-	public ContextNotSetException(string message) : base(message) { }
-	public ContextNotSetException(string message, Exception inner) : base(message, inner) { }
+	public ContextNotSetException() 
+		: base("Context is not set, please use the cli tool to set a context")
+	{ }
 	protected ContextNotSetException(
 	  System.Runtime.Serialization.SerializationInfo info,
 	  System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
