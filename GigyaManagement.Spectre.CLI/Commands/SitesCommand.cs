@@ -154,7 +154,16 @@ internal sealed class PullSiteCommand : AsyncCommand<PullSiteCommand.Settings>
                 SiteName = settings.SiteName
             });
 
-            AnsiConsole.WriteLine($"[green] created at [underline]{scaffoldResult.ProjectPath}[/][/]");
+            AnsiConsole.MarkupLine($"[green]Created at[/]");
+            var path = new TextPath(scaffoldResult.ProjectPath)
+            {
+                RootStyle = new Style(foreground: Color.Red),
+                SeparatorStyle = new Style(foreground: Color.Green),
+                StemStyle = new Style(foreground: Color.Blue),
+                LeafStyle = new Style(foreground: Color.Yellow)
+            };
+
+            AnsiConsole.Write(path);
 
             return 0;
         }

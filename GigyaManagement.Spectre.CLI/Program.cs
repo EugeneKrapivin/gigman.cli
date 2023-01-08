@@ -24,7 +24,7 @@ var app = new CommandApp(typeRegistrar);
 
 app.SetupCommandApp();
 
-app.RunAsync(args);
+await app.RunAsync(args);
 
 
 file static class ServicesExtensions

@@ -14,7 +14,10 @@ internal sealed class TemplateCommandRegistrar : IRegisterCommands
     {
         configurator.AddBranch("template", template =>
         {
-
+            template.SetDescription("Commands handling with template management and creation");
+            
+            template.AddCommand<CreateTemplateCommand>("create")
+                .WithDescription("Creates a template from an existing site");
         });
 
         return configurator;

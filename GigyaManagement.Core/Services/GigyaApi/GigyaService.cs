@@ -2,6 +2,7 @@
 using GigyaManagement.CLI.Services.GigyaApi.Models;
 
 using System.CodeDom.Compiler;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Reflection.Metadata;
@@ -25,6 +26,10 @@ public class GigyaService : IGigyaService, IDisposable
         _httpClient = new HttpClient(new HttpClientHandler()
         {
             AutomaticDecompression = System.Net.DecompressionMethods.GZip
+            //Proxy = new WebProxy
+            //{
+            //    Address = new Uri("http://127.0.0.1:8888")
+            //}
         });
 
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -71,11 +76,13 @@ public class GigyaService : IGigyaService, IDisposable
 
         return siteConfig;
 
-        Task<HttpResponseMessage> Execute(string url, Dictionary<string,string>? payload = null)
+        async Task<HttpResponseMessage> Execute(string url, Dictionary<string,string>? payload = null)
         {
-            return payload?.Any() == true
-                ? _httpClient.PostAsync($"{url}", new FormUrlEncodedContent(payload))
-                : _httpClient.GetAsync($"{url}");
+            var r = payload?.Any() == true
+                ? await _httpClient.PostAsync($"{url}", new FormUrlEncodedContent(payload))
+                : await _httpClient.GetAsync($"{url}");
+
+            return r;
         }
 
         static string GetDomain(string command)

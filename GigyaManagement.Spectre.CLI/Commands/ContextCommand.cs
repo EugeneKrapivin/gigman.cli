@@ -157,6 +157,7 @@ public sealed class SetContextCommand : Command<SetContextCommand.Settings>
         if (string.IsNullOrEmpty(name))
         {
             var availableContexts = _contextService.GetAllContexts().DefinedContexts.Select( x => x.Name);
+            
             name = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
                 .Title("Select a context")

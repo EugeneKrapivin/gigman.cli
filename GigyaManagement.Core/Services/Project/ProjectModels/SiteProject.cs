@@ -1,8 +1,11 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
+using GigyaManagement.CLI.Services.GigyaApi.Configurators;
 using GigyaManagement.CLI.Services.Template.ProjectModels.Resources;
 using GigyaManagement.Core;
+
+using Mediator;
 
 namespace GigyaManagement.CLI.Services.Project.ProjectModels;
 

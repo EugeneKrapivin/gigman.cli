@@ -73,27 +73,31 @@ public class AccountsSchemaResource : ProjectResource<AccountsSchema>, IPersista
         return ser ?? new T();
     }
 
+    private static async Task<string> Persist<T>(T schema, string jsonSchemUri, string folderPath, string schemaFile)
+    {
+        if (schema == null) return "";
+
+        var path = GetSchemaPath(folderPath, schemaFile);
+        await File.WriteAllTextAsync(path, SerializeWithSchema(schema, jsonSchemUri));
+        
+        return path;
+    }
+
     public async Task<string> PersistToDisk(string projectPath)
     {
         var folderPath = Path.Combine(projectPath, _folderName);
         
         Directory.CreateDirectory(folderPath);
-        
-        // TODO: generate json schema and add it to the JSON file for VSc auto completion
-        await File.WriteAllTextAsync(GetSchemaPath(folderPath, _dataSchemaFile), SerializeWithSchema(Resource.DataSchema, _dataJsonSchema));
-        await File.WriteAllTextAsync(GetSchemaPath(folderPath, _profileSchemaFile), SerializeWithSchema(Resource.ProfileSchema, _dataJsonSchema));
-        await File.WriteAllTextAsync(GetSchemaPath(folderPath, _subscriptionSchemaFile), SerializeWithSchema(Resource.SubscriptionsSchema, _subsctiptionsJsonSchema));
-        await File.WriteAllTextAsync(GetSchemaPath(folderPath, _preferencesSchemaFile), SerializeWithSchema(Resource.PreferencesSchema, _preferencesJsonSchema));
 
         var conf = new OnDiskModel
         {
             InheritFrom = this.InheritFrom,
             Schemas = new()
             {
-                ["data"] = GetSchemaPath(folderPath, _dataSchemaFile),
-                ["profile"] = GetSchemaPath(folderPath, _profileSchemaFile),
-                ["subscriptions"] = GetSchemaPath(folderPath, _subscriptionSchemaFile),
-                ["preferences"] = GetSchemaPath(folderPath, _preferencesSchemaFile)
+                ["data"] = await Persist(Resource?.DataSchema, _dataJsonSchema, folderPath, _dataSchemaFile),
+                ["profile"] = await Persist(Resource?.ProfileSchema, _dataJsonSchema, folderPath, _profileSchemaFile),
+                ["subscriptions"] = await Persist(Resource?.SubscriptionsSchema, _subsctiptionsJsonSchema, folderPath, _subscriptionSchemaFile),
+                ["preferences"] = await Persist(Resource?.PreferencesSchema, _preferencesJsonSchema, folderPath, _preferencesSchemaFile)
             }
 
         };
@@ -104,14 +108,14 @@ public class AccountsSchemaResource : ProjectResource<AccountsSchema>, IPersista
         await File.WriteAllTextAsync(path, content);
 
         return folderPath;
+    }
 
-        static string SerializeWithSchema<T>(T source, string schemaUrl)
-        {
-            var obj = JsonObject.Parse(JsonSerializer.Serialize(source))!;
-            obj["$schema"] = schemaUrl;
+    private static string SerializeWithSchema<T>(T source, string schemaUrl)
+    {
+        var obj = JsonObject.Parse(JsonSerializer.Serialize(source))!;
+        obj["$schema"] = schemaUrl;
 
-            return obj.ToJsonString(GlobalUsings.JsonSerializerOptions) ?? string.Empty;
-        }
+        return obj.ToJsonString(GlobalUsings.JsonSerializerOptions) ?? string.Empty;
     }
 
     static string GetSchemaPath(string root, string file) => Path.Combine(root, file);
