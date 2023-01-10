@@ -8,6 +8,7 @@ using GigyaManagement.Core.Services.LockService;
 using GigyaManagement.Spectre.CLI.Commands.Abstractions;
 using GigyaManagement.Spectre.CLI.Commands.ContextCommands;
 using GigyaManagement.Spectre.CLI.Commands.Sites;
+using GigyaManagement.Spectre.CLI.Commands.Solution;
 using GigyaManagement.Spectre.CLI.Infra;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -72,10 +73,11 @@ file static class CommandAppExtensions
                 return -2;
             });
 
-            IRegisterCommands[] commandFactories = 
-            { 
-                new ContextCommandRegistrar(), 
-                new SiteCommandRegistrar() 
+            IRegisterCommands[] commandFactories =
+            {
+                new ContextCommandRegistrar(),
+                new SiteCommandRegistrar(),
+                new SolutionCommandsRegistrar()
             };
 
             foreach (var factory in commandFactories)

@@ -1,5 +1,6 @@
 ﻿using Spectre.Console.Cli;
 using GigyaManagement.Spectre.CLI.Commands.Abstractions;
+using GigyaManagement.Spectre.CLI.Commands.Solution;
 
 namespace GigyaManagement.Spectre.CLI.Commands.Sites;
 
@@ -11,8 +12,6 @@ internal sealed class SiteCommandRegistrar : IRegisterCommands
         {
             site.SetDescription("Commands scoped for site manipulation");
 
-            site.AddCommand<ListSitesCommand>("list")
-                .WithDescription("Lists the sites under the current workspace (workspace is defined by the context)");
             site.AddCommand<PullSiteCommand>("pull")
                 .WithDescription("Pulls a site from Gigya CIAM into a project on disk");
             site.AddCommand<ApplyToSiteCommand>("apply")
