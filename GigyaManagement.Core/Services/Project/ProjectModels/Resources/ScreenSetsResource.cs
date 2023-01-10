@@ -49,10 +49,13 @@ public class ScreenSetsResource : ProjectResource<ScreenSetsConfig>, IPersistabl
 
     public async Task<string> PersistToDisk(string projectPath)
     {
-        foreach(var screen in Resource.ScreenSets)
+        var screenSetsFolder = Path.Combine(projectPath, "screens_sets");
+        Directory.CreateDirectory(screenSetsFolder);
+
+        foreach (var screen in Resource.ScreenSets)
         {
             var screenSetId = screen.ScreenSetId;
-            var folder = Path.Combine(projectPath, "screens_sets", screenSetId);
+            var folder = Path.Combine(screenSetsFolder, screenSetId);
 
             Directory.CreateDirectory(folder);
 

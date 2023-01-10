@@ -25,7 +25,7 @@ public class GigyaService : IGigyaService, IDisposable
         _context = context;
         _httpClient = new HttpClient(new HttpClientHandler()
         {
-            AutomaticDecompression = System.Net.DecompressionMethods.GZip
+            AutomaticDecompression = System.Net.DecompressionMethods.GZip,
             //Proxy = new WebProxy
             //{
             //    Address = new Uri("http://127.0.0.1:8888")

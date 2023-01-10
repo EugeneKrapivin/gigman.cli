@@ -15,10 +15,17 @@ public class SiteProject
 
     public int Version { get; } = 1;
 
-    public string Environment { get; set; }
+    public required string Apikey { get; init; }
 
-    public string Apikey { get; set; }
+    public bool ChildSite { get; set; } = false;
 
+    [JsonIgnore]
+    public List<SiteProject> ChildSites { get; } = new();
+
+    [JsonIgnore]
+    public SiteProject? ParentSite { get; set; }
+
+    [JsonIgnore]
     public string? InheritFrom { get; set; }
 
     [JsonIgnore]
@@ -95,30 +102,40 @@ public class SiteProject
         return project;
     }
 
-    public async Task<(string env, string path)> PersistToDisk(string projectPath)
+    public async Task<string> PersistToDisk(string solutionPath)
+    {
+        var siteProjectPath = Path.Combine(solutionPath, SiteConfigResource.Resource.BaseDomain);
+
+        Directory.CreateDirectory(siteProjectPath);
+
+        await WriteSiteConfigFile(siteProjectPath);
+
+        await SaveSiteResources(siteProjectPath);
+
+        await HandleChildSites(siteProjectPath);
+
+        return siteProjectPath;
+    }
+
+    private async Task HandleChildSites(string siteProjectPath)
+    {
+        foreach (var childSite in ChildSites)
+        {
+            await childSite.PersistToDisk(Path.Combine(siteProjectPath, "child_sites"));
+        }
+    }
+
+    private async Task WriteSiteConfigFile(string siteProjectPath)
     {
         var content = await Serialize();
+        var path = Path.Combine(siteProjectPath, ConfigFileName);
 
-        projectPath = Path.Combine(projectPath, Environment);
-        if (Directory.Exists(projectPath))
-        {
-            Console.WriteLine($"Warning: environment \"{Environment}\" already exists in \"{projectPath}\", this action will overwrite its contents");
-        }
-        else
-        {
-            Directory.CreateDirectory(projectPath);
-        }
-        var path = Path.Combine(projectPath, ConfigFileName);
-
-        File.WriteAllText(path, content);
-
-        await SaveSiteResources(projectPath);
-
-        return (Environment, projectPath);
+        await File.WriteAllTextAsync(path, content);
     }
 
     private async Task SaveSiteResources(string projectPath)
     {
+        Directory.CreateDirectory(projectPath);
         var resources = new List<IPersist?>
         {
             SiteConfigResource,

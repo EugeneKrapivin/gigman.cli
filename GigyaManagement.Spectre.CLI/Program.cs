@@ -2,11 +2,12 @@
 using GigyaManagement.CLI.Services.GigyaApi;
 using GigyaManagement.CLI.Services.GigyaApi.Configurators;
 using GigyaManagement.CLI.Services.GigyaApi.Models;
-using GigyaManagement.CLI.Services.Template.ProjectModels.Resources;
-using GigyaManagement.Core.Exceptions;
 
-using GigyaManagement.Spectre.CLI.Commands;
+using GigyaManagement.Core.Exceptions;
+using GigyaManagement.Core.Services.LockService;
 using GigyaManagement.Spectre.CLI.Commands.Abstractions;
+using GigyaManagement.Spectre.CLI.Commands.ContextCommands;
+using GigyaManagement.Spectre.CLI.Commands.Sites;
 using GigyaManagement.Spectre.CLI.Infra;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -39,8 +40,10 @@ file static class ServicesExtensions
 
     public static IServiceCollection RegisterServices(this IServiceCollection services)
     {
-        services.AddSingleton<IGigyaService, GigyaService>();
+        services.AddSingleton<ILockService, LockService>();
 
+        services.AddSingleton<IGigyaService, GigyaService>();
+        
         services.AddSingleton<IGigyaResourceConfigurator<SiteConfig, string>, GigyaSiteConfigConfigurator>();
         services.AddSingleton<IGigyaResourceConfigurator<AccountsSchema, string>, GigyaSchemaConfigurator>();
         services.AddSingleton<IGigyaResourceConfigurator<ScreenSetsConfig, string>, ScreenSetsConfigurator>();

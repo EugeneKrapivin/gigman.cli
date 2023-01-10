@@ -2,7 +2,7 @@
   "profiles": {
     "GigyaManagement.Spectre.CLI": {
       "commandName": "Project",
-      "commandLineArgs": "site pull 3_I0hI7_M6zfXEmJxRE4YW-i_Z6Np2x42Wchmp0UlQgbOShymhG_pOsuT7Pu3B7SGf primary evgenekr-pc_parentsite_au1.com1"
+      "commandLineArgs": "site pull AU-Market 3_I0hI7_M6zfXEmJxRE4YW-i_Z6Np2x42Wchmp0UlQgbOShymhG_pOsuT7Pu3B7SGf au-parent --include-child-sites"
     }
   }
 }

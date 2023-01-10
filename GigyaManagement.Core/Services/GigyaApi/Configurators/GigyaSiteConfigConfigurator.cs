@@ -33,6 +33,10 @@ public class GigyaSiteConfigConfigurator : IGigyaResourceConfigurator<SiteConfig
 
     public Task<SiteConfig> Extract(string apikey)
     {
-        return _gigyaService.ExecuteGigyaApi<SiteConfig>("admin.getSiteConfig", new Dictionary<string, string> { ["apikey"] = apikey });
+        return _gigyaService.ExecuteGigyaApi<SiteConfig>("admin.getSiteConfig", new Dictionary<string, string> 
+        { 
+            ["apikey"] = apikey,
+            ["includeSiteGroupConfig"] = "true"
+        });
     }
 }

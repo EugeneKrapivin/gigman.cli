@@ -2,6 +2,7 @@
 
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Linq;
 
 namespace GigyaManagement.CLI.Services.Project.ProjectModels;
 
@@ -17,9 +18,7 @@ public sealed class GigyaSolution
 
     public string? InheritFrom { get; set; }
 
-    [JsonIgnore]
-    public List<SiteProject> Environments { get; set; } = new();
-
+    public List<SiteProject> SiteProjects { get; internal set; } = new List<SiteProject>();
     [JsonIgnore]
     public static string ConfigFileName => "site.solution.json";
 
@@ -31,6 +30,39 @@ public sealed class GigyaSolution
     }
 
     public static async Task<GigyaSolution> Load(string path)
+    {
+        var solutionFile = FindSolutionFile(path);
+
+        var solutionOnDiskModel = await ParseSolutionFile(solutionFile);
+
+        var solution = new GigyaSolution
+        {
+            Name = solutionOnDiskModel.Name,
+            Id = solutionOnDiskModel.Id,
+            InheritFrom = solutionOnDiskModel.InheritFrom,
+            IsTemplate = solutionOnDiskModel.IsTemplate,
+            SolutionFolder = path
+        };
+
+        foreach (var site in solutionOnDiskModel.Sites)
+        {
+            var project = await SiteProject.Load(site.ToString());
+            solution.SiteProjects.Add(project);
+        }
+
+        return solution;
+    }
+
+    private static async Task<OnDiskModel> ParseSolutionFile(string solutionFile)
+    {
+        var fileContent = await File.ReadAllTextAsync(solutionFile);
+        var solution = JsonSerializer.Deserialize<OnDiskModel>(fileContent, GlobalUsings.JsonSerializerOptions)
+            ?? throw new Exception($"failed to parse the solutionOnDiskModel solutionFile \"{fileContent}\"");
+        
+        return solution;
+    }
+
+    private static string FindSolutionFile(string path)
     {
         var file = path;
 
@@ -47,30 +79,8 @@ public sealed class GigyaSolution
 
             file = Path.Combine(path, ConfigFileName);
         }
-        var fileContent = await File.ReadAllTextAsync(file);
-        var solution = JsonSerializer.Deserialize<OnDiskModel>(fileContent, GlobalUsings.JsonSerializerOptions);
 
-        if (solution is null)
-        {
-            throw new Exception($"failed to parse the solution file \"{fileContent}\"");
-        }
-
-        var sol = new GigyaSolution
-        {
-            Name = solution.Name,
-            Id = solution.Id,
-            InheritFrom = solution.InheritFrom,
-            IsTemplate = solution.IsTemplate,
-            SolutionFolder = path
-        };
-
-        foreach (var env in solution.Environments)
-        {
-            var project = await SiteProject.Load(env.Value);
-            sol.Environments.Add(project);
-        }
-
-        return sol;
+        return file;
     }
 
     public static GigyaSolution New(string solutionName, string solutionPath)
@@ -84,12 +94,9 @@ public sealed class GigyaSolution
 
     public async Task<string> PersistToDisk()
     {
-        var projects = new List<(string env, string path)>();
-        foreach (var site in this.Environments)
-        {
-            var projectConfPath = await site.PersistToDisk(SolutionFolder);
-            projects.Add(projectConfPath);
-        }
+        var sitePersistTasks = SiteProjects.Select(x => x.PersistToDisk(SolutionFolder)).ToList();
+
+        await Task.WhenAll(sitePersistTasks);
 
         var content = JsonSerializer.Serialize(new OnDiskModel
         {
@@ -97,7 +104,7 @@ public sealed class GigyaSolution
             Name = Name,
             InheritFrom = InheritFrom,
             IsTemplate = IsTemplate,
-            Environments = projects.ToDictionary(x => x.env, x => x.path)
+            Sites = sitePersistTasks.Select(x => new Uri(Path.GetRelativePath(SolutionFolder, x.Result), UriKind.Relative)).ToList()
         }, GlobalUsings.JsonSerializerOptions);
 
         var path = Path.Combine(SolutionFolder, ConfigFileName);
@@ -120,16 +127,18 @@ public sealed class GigyaSolution
 
         public string? InheritFrom { get; set; }
 
-        public Dictionary<string, string> Environments { get; set; } = new();
+        public IEnumerable<Uri> Sites { get; set; }
     }
 
     public void Add(SiteProject resource)
     {
         if (resource == null) throw new ArgumentNullException(nameof(resource));
 
-        if (!Environments.Any(x => x.Apikey == resource.Apikey))
+        // ensure we are not adding a site project already added to this solution
+        var parent = SiteProjects.SingleOrDefault(x => x.Apikey == resource.Apikey);
+        if (parent == null)
         {
-            Environments.Add(resource);
+            SiteProjects.Add(resource);
         }
     }
 }

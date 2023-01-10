@@ -2,7 +2,6 @@
 using GigyaManagement.CLI.Services.GigyaApi;
 using GigyaManagement.CLI.Services.GigyaApi.Models;
 using GigyaManagement.CLI.Services.Project.ProjectModels;
-using GigyaManagement.CLI.Services.Template;
 
 using Mediator;
 namespace GigyaManagement.CLI.Handlers;
@@ -44,33 +43,33 @@ public class ApplySiteChangesHandler : IRequestHandler<ApplySiteChangesRequest, 
 
     public async ValueTask<ApplySiteChangesResult> Handle(ApplySiteChangesRequest request, CancellationToken cancellationToken)
     {
-        var siteFolder = Path.Combine(_context.Workspace, "_sites", request.Solution);
+        //var siteFolder = Path.Combine(_context.Workspace, "_sites", request.Solution);
 
-        // dirty trick - if solution contains a valid path to a solution folder - use that folder as root for operations for apply
-        if (File.Exists(Path.Combine(request.Solution, "site.solution.json")))
-        {
-            siteFolder = request.Solution;
-        }
+        //// dirty trick - if solution contains a valid path to a solution folder - use that folder as root for operations for apply
+        //if (File.Exists(Path.Combine(request.Solution, "site.solution.json")))
+        //{
+        //    siteFolder = request.Solution;
+        //}
 
-        var solution = await GigyaSolution.Load(siteFolder);
+        //var solution = await GigyaSolution.Load(siteFolder);
 
-        var project = solution.Environments.SingleOrDefault(x => x.Environment == request.Environment);
+        //var project = solution.SiteProjects.SingleOrDefault(x => x.name == request.Environment);
         
-        if (project == null)
-        {
-            throw new Exception($"Environment \"{request.Environment}\" was not found for solution \"{request.Solution}\"");
-        }
+        //if (project == null)
+        //{
+        //    throw new Exception($"Environment \"{request.Environment}\" was not found for solution \"{request.Solution}\"");
+        //}
 
-        var target = request.SelfApply ? project.Apikey : request.TargetApiKey;
+        //var target = request.SelfApply ? project.Apikey : request.TargetApiKey;
 
-        if (!request.SelfApply && string.IsNullOrEmpty(request.TargetApiKey))
-        {
-            throw new Exception("when not applying to self, a target apikey must be passed");
-        }
+        //if (!request.SelfApply && string.IsNullOrEmpty(request.TargetApiKey))
+        //{
+        //    throw new Exception("when not applying to self, a target apikey must be passed");
+        //}
 
-        if (project.SiteConfigResource?.Resource is not null) await _siteConfigConfigurator.Apply(target!, project.SiteConfigResource.Resource);
-        if (project.AccountsSchemaResource?.Resource is not null) await _accountsSchemaConfigurator.Apply(target!, project.AccountsSchemaResource.Resource);
-        //if (project.ScreenSetsResource?.Resource is not null) await _screenSetsConfigurator.Apply(target!, project.ScreenSetsResource.Resource);
+        //if (project.SiteConfigResource?.Resource is not null) await _siteConfigConfigurator.Apply(target!, project.SiteConfigResource.Resource);
+        //if (project.AccountsSchemaResource?.Resource is not null) await _accountsSchemaConfigurator.Apply(target!, project.AccountsSchemaResource.Resource);
+        ////if (project.ScreenSetsResource?.Resource is not null) await _screenSetsConfigurator.Apply(target!, project.ScreenSetsResource.Resource);
 
         return new();
     }

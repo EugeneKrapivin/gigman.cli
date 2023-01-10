@@ -25,7 +25,7 @@ public interface ILoadable<T> where T: ILoadable<T>, IPersistable
 
 public static class ProjectResource
 {
-    public static Task<T?> Load<T>(string path)
+    public static Task<T> Load<T>(string path)
           where T : IPersistable
     {
         var file = path;
@@ -47,7 +47,7 @@ public static class ProjectResource
 
         var project = JsonSerializer.Deserialize<T>(File.ReadAllText(file), GlobalUsings.JsonSerializerOptions);
 
-        return Task.FromResult(project);
+        return Task.FromResult(project)!;
     }
 }
 

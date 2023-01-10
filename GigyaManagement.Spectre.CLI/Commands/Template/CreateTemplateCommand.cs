@@ -1,28 +1,11 @@
 ﻿using GigyaManagement.CLI.Handlers;
-using GigyaManagement.Spectre.CLI.Commands.Abstractions;
 
 using Mediator;
 
 using Spectre.Console;
 using Spectre.Console.Cli;
 
-namespace GigyaManagement.Spectre.CLI.Commands;
-
-internal sealed class TemplateCommandRegistrar : IRegisterCommands
-{
-    public IConfigurator RegisterCommand(IConfigurator configurator)
-    {
-        configurator.AddBranch("template", template =>
-        {
-            template.SetDescription("Commands handling with template management and creation");
-            
-            template.AddCommand<CreateTemplateCommand>("create")
-                .WithDescription("Creates a template from an existing site");
-        });
-
-        return configurator;
-    }
-}
+namespace GigyaManagement.Spectre.CLI.Commands.Template;
 
 internal sealed class CreateTemplateCommand : AsyncCommand<CreateTemplateCommand.Settings>
 {

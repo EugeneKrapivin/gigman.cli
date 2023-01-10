@@ -46,8 +46,20 @@ public partial class SiteConfig
     [JsonPropertyName("customAPIDomainPrefix")]
     public string CustomApiDomainPrefix { get; set; }
 
+    [JsonPropertyName("siteGroupConfig")]
+    public SiteGroupSettingsModel SiteGroupSettings { get; set; }
+
     public partial class FunCaptcha
     {
+    }
+
+    public partial class SiteGroupSettingsModel
+    {
+        [JsonPropertyName("enableSSO")]
+        public bool EnableSSO { get; set; }
+
+        [JsonPropertyName("members")]
+        public IEnumerable<string> Members { get; set; }
     }
 
     public partial class InvisibleRecaptcha

@@ -1,4 +1,6 @@
-﻿namespace GigyaManagement.CLI.Services.Template.ProjectModels.Resources;
+﻿using GigyaManagement.Core.Exceptions;
+
+namespace GigyaManagement.CLI.Services.Template.ProjectModels.Resources;
 
 public class FlowsResource : ProjectResource<Conf>, IPersistable, ILoadable<FlowsResource>
 {
@@ -6,10 +8,12 @@ public class FlowsResource : ProjectResource<Conf>, IPersistable, ILoadable<Flow
     public static string ConfigFileName => $"{resourceFolder}.config.json";
 
     public static Task<FlowsResource> Load(string path) 
-        => ProjectResource.Load<FlowsResource>(Path.Combine(path, resourceFolder));
+        => ProjectResource.Load<FlowsResource>(Path.Combine(path, resourceFolder)) 
+            ?? throw new ResourceLoadException(nameof(FlowsResource), path);
 
     public async Task<string> PersistToDisk(string projectPath)
     {
+        
         var confFolderPath = Path.Combine(projectPath, resourceFolder);
         Directory.CreateDirectory(confFolderPath);
         return await PersistToDisk(confFolderPath, ConfigFileName);

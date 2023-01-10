@@ -25,14 +25,14 @@ public class ScrapeTemplateResult
     public string ProjectPath { get; internal set; }
 }
 
-public class ScrapeTemplateHandler : IRequestHandler<ScrapeTemlateRequest, ScrapeTemplateResult>
+public class CreateTemplateHandler : IRequestHandler<ScrapeTemlateRequest, ScrapeTemplateResult>
 {
     private readonly IGigyaResourceConfigurator<SiteConfig, string> _siteConfigConfigurator;
     private readonly IGigyaResourceConfigurator<AccountsSchema, string> _accountsSchemaConfigurator;
     private readonly IGigyaResourceConfigurator<ScreenSetsConfig, string> _screenSetsConfigurator;
     private readonly IContextService _contextService;
 
-    public ScrapeTemplateHandler(
+    public CreateTemplateHandler(
         IGigyaResourceConfigurator<SiteConfig, string> siteConfigConfigurator,
         IGigyaResourceConfigurator<AccountsSchema, string> accountsSchemaConfigurator,
         IGigyaResourceConfigurator<ScreenSetsConfig, string> screenSetsConfigurator,
